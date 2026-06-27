@@ -9,10 +9,10 @@ Chess diagram generator and FEN utilities. Parse and edit FEN positions, render 
 [![types](https://img.shields.io/npm/types/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
 [![license](https://img.shields.io/npm/l/@chessvision-org/chess-vision)](LICENSE)
 
--  **Zero dependencies** — nothing pulled into your tree.
--  **Universal** — runs in Node.js and the browser, no DOM, no canvas, no network.
--  **Dual ESM + CJS** with first-class TypeScript types.
--  **Batteries included** — FEN parsing/editing, SVG rendering with an inline piece set, 20 board themes, color & DPI utilities, and more.
+- **Zero dependencies** — nothing pulled into your tree.
+- **Universal** — runs in Node.js and the browser, no DOM, no canvas, no network.
+- **Dual ESM + CJS** with first-class TypeScript types.
+- **Batteries included** — FEN parsing/editing, SVG rendering with an inline piece set, 20 board themes, color & DPI utilities, and more.
 
 ---
 
@@ -480,12 +480,12 @@ import type {
 
 ## Documentation & project
 
-- 📚 [Documentation](docs/README.md) — guides, architecture, and references.
-- 🗺️ [Roadmap](ROADMAP.md) — what's planned and what's out of scope.
-- 📝 [Changelog](CHANGELOG.md) — what changed in each release.
-- 🤝 [Contributing](CONTRIBUTING.md) — how to propose and submit changes.
-- 🔒 [Security policy](SECURITY.md) — how to report a vulnerability.
-- 💬 [Discussions](https://github.com/chessvision-org/chess-vision-utils/discussions) — questions and ideas.
+- [Documentation](docs/README.md) — guides, architecture, and references.
+- [Roadmap](ROADMAP.md) — what's planned and what's out of scope.
+- [Changelog](CHANGELOG.md) — what changed in each release.
+- [Contributing](CONTRIBUTING.md) — how to propose and submit changes.
+- [Security policy](SECURITY.md) — how to report a vulnerability.
+- [Discussions](https://github.com/chessvision-org/chess-vision-utils/discussions) — questions and ideas.
 
 ---
 

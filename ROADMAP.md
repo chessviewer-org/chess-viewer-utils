@@ -12,7 +12,7 @@ Have an idea? Open a [discussion](../../discussions) or a
 
 ## Released
 
-### v1.0.0 — Foundation ✅
+### v1.0.0 — Foundation
 
 - FEN parsing, validation, and full six-field record parse/serialize.
 - Pure, immutable board manipulation helpers.
