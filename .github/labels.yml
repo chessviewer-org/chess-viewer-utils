@@ -88,6 +88,10 @@
   color: "b60205"
   description: TypeScript types and interfaces
 
+- name: "area: a11y"
+  color: "4969c1"
+  description: Accessibility — SVG aria labels, screen-reader descriptions
+
 # ── Resolution ────────────────────────────────────────────────────────────────
 - name: duplicate
   color: "cfd3d7"
@@ -130,6 +134,14 @@
   color: "fbca04"
   description: Awaiting an update or response from the author
 
+- name: "status: shipping"
+  color: "9ed361"
+  description: Merged and awaiting the next npm release
+
+- name: "status: decayed"
+  color: "e99695"
+  description: Closed for inactivity — needs follow-up to reopen
+
 - name: stale
   color: "cccccc"
   description: No activity for 60+ days — will be closed unless updated
@@ -155,3 +167,20 @@
 - name: "priority: low"
   color: "fef2c0"
   description: Nice to have
+
+- name: deprioritized
+  color: "e99695"
+  description: Deprioritized — lacks detail or ignores the contribution guidelines
+
+# ── Moderation / PR ───────────────────────────────────────────────────────────
+- name: spam
+  color: "ffe27d"
+  description: Low-effort or spammy submission
+
+- name: "DO NOT MERGE!"
+  color: "b60205"
+  description: Must not be merged yet
+
+- name: "MERGE CONFLICT!"
+  color: "b60205"
+  description: PR has a merge conflict and needs to be updated
