@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [Unreleased]
 
+### Added
+
+- **`generateDiagram` `coordColor` option** — configurable rank/file coordinate
+  label color. Accepts a hex string or the names `'white'` / `'black'` (e.g. the
+  result of `themeCoordinateColor`), so coordinates stay legible on dark boards.
+  Defaults to `'#000000'` for backward compatibility.
+
 ---
 
 ## [1.0.0] - 2026-06-27

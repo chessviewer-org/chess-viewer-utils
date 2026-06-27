@@ -57,7 +57,7 @@ document.getElementById('board').innerHTML = svg;
 The diagram below is real SVG produced by `generateDiagram` — no images, no canvas:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/chessvision-org/chess-vision-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Ocean theme)">
+  <img src="https://raw.githubusercontent.com/chessvision-org/chess-vision-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Wood theme)">
 </p>
 
 ---
@@ -126,8 +126,9 @@ const svg = generateDiagram({
   showCoords: true,     // show a/b/c… and 1/2/3… labels (default: false)
   flipped: false,       // show from Black's perspective (default: false)
   showFrame: false,     // thin outer frame (default: false)
-  lightSquare: '#f0d9b5',
-  darkSquare: '#b58863',
+  lightSquare: '#d4af7a',
+  darkSquare: '#8b4513',
+  coordColor: 'white',  // hex or 'white' | 'black' — keep coords legible on dark boards (default: '#000000')
   label: 'Starting position after 1.e4',  // aria-label (default: 'Chess position')
 });
 // → '<svg xmlns="http://www.w3.org/2000/svg" …>…</svg>'

@@ -209,6 +209,28 @@ test('generateDiagram: invalid color falls back to default', () => {
   assert.ok(svg.includes('#f0d9b5'));
 });
 
+test('generateDiagram: coordinate color is configurable', () => {
+  const svg = generateDiagram({ fen: START_FEN, showCoords: true, coordColor: '#ffffff' });
+  assert.ok(svg.includes('fill="#ffffff"'));
+});
+
+test('generateDiagram: coordinate color defaults to black', () => {
+  const svg = generateDiagram({ fen: START_FEN, showCoords: true });
+  assert.ok(svg.includes('fill="#000000"'));
+});
+
+test('generateDiagram: invalid coordinate color falls back to black', () => {
+  const svg = generateDiagram({ fen: START_FEN, showCoords: true, coordColor: 'nope' });
+  assert.ok(svg.includes('fill="#000000"'));
+});
+
+test('generateDiagram: coordColor accepts "white"/"black" names', () => {
+  const white = generateDiagram({ fen: START_FEN, showCoords: true, coordColor: 'white' });
+  assert.ok(white.includes('fill="#ffffff"'));
+  const black = generateDiagram({ fen: START_FEN, showCoords: true, coordColor: 'black' });
+  assert.ok(black.includes('fill="#000000"'));
+});
+
 // ─── COLORS ───────────────────────────────────────────────────────────────────
 
 test('hexToRgb: known values', () => {

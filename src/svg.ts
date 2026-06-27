@@ -16,6 +16,12 @@ export interface DiagramOptions {
   flipped?: boolean;
   /** Whether to show a thin outer frame (default false) */
   showFrame?: boolean;
+  /**
+   * Color of the rank/file coordinate labels. Accepts a hex string or the
+   * names `'white'` / `'black'` (e.g. the result of `themeCoordinateColor`).
+   * Default '#000000'.
+   */
+  coordColor?: string;
   /** Accessible label for the SVG (default 'Chess position') */
   label?: string;
 }
@@ -38,6 +44,16 @@ function safeColor(color: string | undefined, fallback: string): string {
 }
 
 /**
+ * Resolves a coordinate color. Accepts a hex string or the convenience names
+ * `'white'` / `'black'` (as returned by `themeCoordinateColor`).
+ */
+function resolveCoordColor(color: string | undefined, fallback: string): string {
+  if (color === 'white') return '#ffffff';
+  if (color === 'black') return '#000000';
+  return safeColor(color, fallback);
+}
+
+/**
  * Generates a self-contained SVG chess diagram from a FEN string.
  * Works in Node.js and browsers — no DOM required.
  *
@@ -57,6 +73,7 @@ export function generateDiagram(options: DiagramOptions): string {
 
   const lightSquare = safeColor(options.lightSquare, '#f0d9b5');
   const darkSquare = safeColor(options.darkSquare, '#b58863');
+  const coordColor = resolveCoordColor(options.coordColor, '#000000');
 
   const board: BoardMatrix = parseFEN(fen);
 
@@ -145,7 +162,7 @@ export function generateDiagram(options: DiagramOptions): string {
 
     const fontSize = Math.round(Math.max(10, coordBorder * 0.72));
     const fontFamily = "'Inter', system-ui, sans-serif";
-    const textAttrs = `font-family="${escapeXml(fontFamily)}" font-size="${fontSize}" font-weight="600" fill="#000000" text-anchor="middle"`;
+    const textAttrs = `font-family="${escapeXml(fontFamily)}" font-size="${fontSize}" font-weight="600" fill="${escapeXml(coordColor)}" text-anchor="middle"`;
 
     for (let col = 0; col < 8; col++) {
       const x = boardX + col * squareSize + squareSize / 2;
