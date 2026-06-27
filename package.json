@@ -30,19 +30,29 @@
     "chess",
     "fen",
     "fen-parser",
+    "fen-to-svg",
     "svg",
+    "chess-svg",
     "diagram",
+    "chess-diagram",
     "board",
     "chessboard",
-    "generator",
-    "chessvision",
-    "chess-diagram",
+    "chessboard-image",
+    "chess-board",
+    "chess-position",
     "chess-utils",
     "board-themes",
-    "dpi"
+    "lichess",
+    "dpi",
+    "chessvision",
+    "typescript"
   ],
-  "author": "chessvision-org",
+  "author": "ChessVision <contact@chessvision.org> (https://chessvision.org)",
   "license": "AGPL-3.0",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/chessvision-org/.github#support-the-project"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/chessvision-org/chess-vision-utils.git"

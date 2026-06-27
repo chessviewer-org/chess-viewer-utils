@@ -1,10 +1,18 @@
 # @chessvision-org/chess-vision
 
-Chess diagram generator and FEN utilities. Parse and edit FEN positions, render SVG board diagrams, manipulate boards, work with colors, board themes, presets, images, and history — in Node.js or the browser with no DOM required.
+Chess diagram generator and FEN utilities. Parse and edit FEN positions, render SVG board diagrams, manipulate boards, work with colors, board themes, presets, images, and history — in Node.js or the browser with **no dependencies and no DOM required**.
 
 [![npm version](https://img.shields.io/npm/v/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
+[![npm downloads](https://img.shields.io/npm/dm/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@chessvision-org/chess-vision)](https://bundlephobia.com/package/@chessvision-org/chess-vision)
 [![CI](https://github.com/chessvision-org/chess-vision-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/chessvision-org/chess-vision-utils/actions/workflows/ci.yml)
+[![types](https://img.shields.io/npm/types/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
 [![license](https://img.shields.io/npm/l/@chessvision-org/chess-vision)](LICENSE)
+
+-  **Zero dependencies** — nothing pulled into your tree.
+-  **Universal** — runs in Node.js and the browser, no DOM, no canvas, no network.
+-  **Dual ESM + CJS** with first-class TypeScript types.
+-  **Batteries included** — FEN parsing/editing, SVG rendering with an inline piece set, 20 board themes, color & DPI utilities, and more.
 
 ---
 
@@ -43,6 +51,14 @@ writeFileSync('board.svg', svg);
 // Or embed directly in HTML
 document.getElementById('board').innerHTML = svg;
 ```
+
+### Example output
+
+The diagram below is real SVG produced by `generateDiagram` — no images, no canvas:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/chessvision-org/chess-vision-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Ocean theme)">
+</p>
 
 ---
 
