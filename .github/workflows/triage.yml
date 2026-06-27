@@ -1,6 +1,6 @@
 name: Issue Triage
 
-# Applies needs-triage to every newly opened issue so nothing falls
+# Applies "status: triage" to every newly opened issue so nothing falls
 # through the cracks without a maintainer review.
 
 on:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   label:
-    name: Apply needs-triage
+    name: Apply status:triage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
@@ -22,5 +22,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              labels: ['needs-triage'],
+              labels: ['status: triage'],
             });
