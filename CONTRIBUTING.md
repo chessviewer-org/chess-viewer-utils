@@ -1,4 +1,4 @@
-# Contributing to @chessvision-org/chess-vision
+# Contributing to @chessviewer-org/chess-viewer
 
 Thanks for contributing! This is an npm utility package — all contributions should keep the library **zero-dependency**, **Node.js + browser compatible**, and **fully typed**.
 
@@ -25,8 +25,8 @@ A contribution is **out of scope** if it:
 ## Setup
 
 ```bash
-git clone https://github.com/chessvision-org/chess-vision-utils.git
-cd chess-vision-utils
+git clone https://github.com/chessviewer-org/chess-viewer-utils.git
+cd chess-viewer-utils
 npm install
 npm test        # 107 tests should pass
 npm run build   # dist/ should build clean

@@ -1,15 +1,15 @@
-# Code owners for chess-vision-utils.
+# Code owners for chess-viewer-utils.
 # These owners are requested for review automatically on every pull request.
 # See https://docs.github.com/articles/about-code-owners
 
 # Default owner for everything in the repository.
-*                       @chessvision-org/maintainers
+*                       @chessviewer-org/maintainers
 
 # Build, release, and CI configuration.
-/.github/               @chessvision-org/maintainers
-/.releaserc.json        @chessvision-org/maintainers
-/package.json           @chessvision-org/maintainers
-/tsconfig.json          @chessvision-org/maintainers
+/.github/               @chessviewer-org/maintainers
+/.releaserc.json        @chessviewer-org/maintainers
+/package.json           @chessviewer-org/maintainers
+/tsconfig.json          @chessviewer-org/maintainers
 
 # Public API surface — changes here are breaking-change sensitive.
-/src/index.ts           @chessvision-org/maintainers
+/src/index.ts           @chessviewer-org/maintainers

@@ -1,7 +1,7 @@
 # Single source of truth for repository labels.
 # Synced to GitHub by .github/workflows/label-sync.yml on every push to main.
 # Edit here — never in the GitHub UI.
-# Colors mirror the chessvision-org/chess-vision palette.
+# Colors mirror the chessviewer-org/chess-viewer palette.
 
 # ── Type ──────────────────────────────────────────────────────────────────────
 - name: bug

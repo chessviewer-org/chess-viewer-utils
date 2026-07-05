@@ -39,7 +39,7 @@ jobs:
           set -euo pipefail
 
           version="${NAME:-$TAG}"
-          pkg="@chessvision-org/chess-vision"
+          pkg="@chessviewer-org/chess-viewer"
 
           # Trim the release notes to a readable highlight reel.
           notes="$(printf '%s' "$BODY" \

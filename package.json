@@ -1,6 +1,6 @@
 {
-  "name": "@chessvision-org/chess-vision",
-  "version": "1.0.0",
+  "name": "@chessviewer-org/chess-viewer",
+  "version": "1.0.1",
   "description": "Chess diagram toolkit — parse & edit FEN positions, manipulate boards, render SVG diagrams, board themes, color, image & DPI utilities. Works in Node.js and browsers.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -44,22 +44,22 @@
     "board-themes",
     "lichess",
     "dpi",
-    "chessvision",
+    "chessviewer",
     "typescript"
   ],
-  "author": "ChessVision <contact@chessvision.org> (https://chessvision.org)",
+  "author": "ChessViewer <contact@chessvision.org> (https://chessvision.org)",
   "license": "AGPL-3.0",
   "funding": {
     "type": "github",
-    "url": "https://github.com/chessvision-org/.github#support-the-project"
+    "url": "https://github.com/chessviewer-org/.github#support-the-project"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/chessvision-org/chess-vision-utils.git"
+    "url": "https://github.com/chessviewer-org/chess-viewer-utils.git"
   },
-  "homepage": "https://github.com/chessvision-org/chess-vision-utils#readme",
+  "homepage": "https://github.com/chessviewer-org/chess-viewer-utils#readme",
   "bugs": {
-    "url": "https://github.com/chessvision-org/chess-vision-utils/issues"
+    "url": "https://github.com/chessviewer-org/chess-viewer-utils/issues"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

@@ -1,6 +1,6 @@
 # Examples
 
-Runnable examples for [`@chessvision-org/chess-vision`](https://www.npmjs.com/package/@chessvision-org/chess-vision).
+Runnable examples for [`@chessviewer-org/chess-viewer`](https://www.npmjs.com/package/@chessviewer-org/chess-viewer).
 
 Each file is self-contained. Run them with [`tsx`](https://github.com/privatenumber/tsx) (no build step needed):
 
@@ -18,4 +18,4 @@ npx tsx examples/themes.ts
 | [`themes.ts`](./themes.ts) | List board themes and piece sets, and pick a contrast-safe coordinate color. |
 
 > The examples import from `../src` so they always track the latest source.
-> When consuming the published package, import from `@chessvision-org/chess-vision` instead.
+> When consuming the published package, import from `@chessviewer-org/chess-viewer` instead.

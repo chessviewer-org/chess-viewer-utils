@@ -12,8 +12,8 @@ body:
         **Do NOT report exploitable vulnerabilities here.** Public issues disclose
         the problem before a fix is available.
 
-        Instead, [report it privately via GitHub Security Advisory](https://github.com/chessvision-org/chess-vision-utils/security/advisories/new).
-        See [SECURITY.md](https://github.com/chessvision-org/chess-vision-utils/blob/main/SECURITY.md) for the full policy.
+        Instead, [report it privately via GitHub Security Advisory](https://github.com/chessviewer-org/chess-viewer-utils/security/advisories/new).
+        See [SECURITY.md](https://github.com/chessviewer-org/chess-viewer-utils/blob/main/SECURITY.md) for the full policy.
 
         Use this template **only** for non-sensitive, low-risk security hygiene
         items — e.g. a hardening suggestion or an outdated transitive dependency

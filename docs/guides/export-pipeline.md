@@ -8,7 +8,7 @@ does not rasterize (that keeps it dependency-free).
 ## 1. Render SVG
 
 ```ts
-import { generateDiagram } from '@chessvision-org/chess-vision';
+import { generateDiagram } from '@chessviewer-org/chess-viewer';
 
 const svg = generateDiagram({ fen, size: 1200 }); // render large, then scale down
 ```
@@ -22,7 +22,7 @@ const svg = generateDiagram({ fen, size: 1200 }); // render large, then scale do
 ## 3. Stamp DPI
 
 ```ts
-import { changeDPI } from '@chessvision-org/chess-vision';
+import { changeDPI } from '@chessviewer-org/chess-viewer';
 
 // `blob` is the PNG/JPEG from step 2
 const print = await changeDPI(blob, 300, 'png'); // 300 DPI for print
@@ -35,7 +35,7 @@ place. It works in both Node.js and the browser because it operates on `Blob` /
 ## 4. Verify dimensions and physical size
 
 ```ts
-import { readImageDimensions, physicalSize } from '@chessvision-org/chess-vision';
+import { readImageDimensions, physicalSize } from '@chessviewer-org/chess-viewer';
 
 const bytes = new Uint8Array(await print.arrayBuffer());
 const dims = readImageDimensions(bytes);     // { width: 1200, height: 1200 }

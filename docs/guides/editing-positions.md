@@ -16,7 +16,7 @@ Use `squareToIndices` / `indicesToSquare` to convert explicitly.
 ## Read a full position
 
 ```ts
-import { parseFENRecord, findKing } from '@chessvision-org/chess-vision';
+import { parseFENRecord, findKing } from '@chessviewer-org/chess-viewer';
 
 const record = parseFENRecord('rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 5 12');
 record.activeColor;          // 'b'
@@ -27,7 +27,7 @@ findKing(record.board, 'w'); // 'e1'
 ## Edit immutably
 
 ```ts
-import { parseFEN, movePiece, removePieceAt, materialBalance } from '@chessvision-org/chess-vision';
+import { parseFEN, movePiece, removePieceAt, materialBalance } from '@chessviewer-org/chess-viewer';
 
 const start = parseFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 
@@ -39,7 +39,7 @@ materialBalance(oddsGame);                       // -5 (Black is up a rook of ma
 ## Re-serialize
 
 ```ts
-import { parseFENRecord, buildFENRecord, toggleActiveColor, movePiece } from '@chessvision-org/chess-vision';
+import { parseFENRecord, buildFENRecord, toggleActiveColor, movePiece } from '@chessviewer-org/chess-viewer';
 
 const record = parseFENRecord('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 const next = toggleActiveColor({ ...record, board: movePiece(record.board, 'e2', 'e4') });

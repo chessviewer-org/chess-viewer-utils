@@ -1,6 +1,6 @@
 # Publishing Guide
 
-This document describes how releases of `@chessvision-org/chess-vision` are
+This document describes how releases of `@chessviewer-org/chess-viewer` are
 produced and published to the npm registry.
 
 ## Automated publishing (recommended)
@@ -12,14 +12,14 @@ Actions OIDC, and packages are published with provenance attestation.
 
 ### 1. Configure the Trusted Publisher on npm (one-time)
 
-On [npmjs.com](https://www.npmjs.com/package/@chessvision-org/chess-vision/access),
+On [npmjs.com](https://www.npmjs.com/package/@chessviewer-org/chess-viewer/access),
 open the package and go to **Settings → Trusted Publisher → Add publisher**:
 
 | Field                | Value                  |
 | -------------------- | ---------------------- |
 | Publisher            | `GitHub Actions`       |
-| Organization or user | `chessvision-org`      |
-| Repository           | `chess-vision-utils`   |
+| Organization or user | `chessviewer-org`      |
+| Repository           | `chess-viewer-utils`   |
 | Workflow filename    | `release.yml`          |
 | Environment name     | *(leave empty)*        |
 | Allowed actions      | `publish` (and optionally `stage publish`) |
@@ -63,7 +63,7 @@ npm whoami   # verify you are logged in
 
 ### 2. Verify the npm organization
 
-Scoped packages require the `chessvision-org` organization to exist and for
+Scoped packages require the `chessviewer-org` organization to exist and for
 your account to have publish access to it. It can be created at
 [npmjs.com/org/create](https://www.npmjs.com/org/create) if it does not already
 exist.
@@ -107,30 +107,30 @@ BREAKING CHANGE: generateDiagram is now renderDiagram"
 
 ```bash
 # Latest published version
-npm view @chessvision-org/chess-vision version
+npm view @chessviewer-org/chess-viewer version
 
 # All published versions
-npm view @chessvision-org/chess-vision versions --json
+npm view @chessviewer-org/chess-viewer versions --json
 
 # Locally installed version
-npm list @chessvision-org/chess-vision
+npm list @chessviewer-org/chess-viewer
 
 # Latest stable
-npm install @chessvision-org/chess-vision
+npm install @chessviewer-org/chess-viewer
 
 # A specific version
-npm install @chessvision-org/chess-vision@1.0.0
+npm install @chessviewer-org/chess-viewer@1.0.0
 
 # Latest minor within a major (always the newest 1.x)
-npm install @chessvision-org/chess-vision@^1.0.0
+npm install @chessviewer-org/chess-viewer@^1.0.0
 
 # Latest patch within a minor (stay on 1.2.x)
-npm install @chessvision-org/chess-vision@~1.2.0
+npm install @chessviewer-org/chess-viewer@~1.2.0
 
 # Upgrade
-npm update @chessvision-org/chess-vision
+npm update @chessviewer-org/chess-viewer
 # or
-npm install @chessvision-org/chess-vision@latest
+npm install @chessviewer-org/chess-viewer@latest
 ```
 
 ---

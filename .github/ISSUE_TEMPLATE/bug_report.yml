@@ -27,7 +27,7 @@ body:
       description: The smallest code snippet that shows the problem.
       render: typescript
       placeholder: |
-        import { generateDiagram } from '@chessvision-org/chess-vision';
+        import { generateDiagram } from '@chessviewer-org/chess-viewer';
 
         const svg = generateDiagram({
           fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -41,7 +41,7 @@ body:
     id: version
     attributes:
       label: Package version
-      description: Run `npm list @chessvision-org/chess-vision` to find it.
+      description: Run `npm list @chessviewer-org/chess-viewer` to find it.
       placeholder: "1.0.0"
     validations:
       required: true

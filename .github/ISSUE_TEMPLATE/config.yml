@@ -2,13 +2,13 @@ blank_issues_enabled: false
 
 contact_links:
   - name: Question or discussion
-    url: https://github.com/chessvision-org/chess-vision-utils/discussions
+    url: https://github.com/chessviewer-org/chess-viewer-utils/discussions
     about: Ask how to use the package, share what you built, or propose ideas — issues are for bugs and requests only.
 
   - name: Security vulnerability
-    url: https://github.com/chessvision-org/chess-vision-utils/security/advisories/new
+    url: https://github.com/chessviewer-org/chess-viewer-utils/security/advisories/new
     about: Report vulnerabilities privately via GitHub Security Advisory — do NOT open a public issue.
 
   - name: npm package page
-    url: https://www.npmjs.com/package/@chessvision-org/chess-vision
+    url: https://www.npmjs.com/package/@chessviewer-org/chess-viewer
     about: Check the latest published version and release history.

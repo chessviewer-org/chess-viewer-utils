@@ -33,7 +33,7 @@
     }],
     ["@semantic-release/changelog", {
       "changelogFile": "CHANGELOG.md",
-      "changelogTitle": "# Changelog\n\nAll notable changes to `@chessvision-org/chess-vision` are documented here.\nFormat follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows [Semantic Versioning](https://semver.org/)."
+      "changelogTitle": "# Changelog\n\nAll notable changes to `@chessviewer-org/chess-viewer` are documented here.\nFormat follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows [Semantic Versioning](https://semver.org/)."
     }],
     ["@semantic-release/npm", {
       "npmPublish": true,

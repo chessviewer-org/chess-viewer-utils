@@ -25,14 +25,14 @@ This package is a **zero-dependency utility library**. Its security surface is s
 
 ### Option 1 — GitHub Security Advisory (preferred)
 
-1. Go to the [Security tab](https://github.com/chessvision-org/chess-vision-utils/security)
+1. Go to the [Security tab](https://github.com/chessviewer-org/chess-viewer-utils/security)
 2. Click **"Report a vulnerability"**
 3. Fill in the private advisory form
 
 ### Option 2 — Direct Email
 
 **To:** [contact@chessvision.org](mailto:contact@chessvision.org)  
-**Subject:** `[SECURITY] chess-vision-utils — <brief description>`
+**Subject:** `[SECURITY] chess-viewer-utils — <brief description>`
 
 ### What to include
 

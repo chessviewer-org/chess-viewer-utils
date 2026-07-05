@@ -4,7 +4,7 @@ These notes help AI assistants make changes that fit this project.
 
 ## What this is
 
-`@chessvision-org/chess-vision` is a **dependency-free chess diagram toolkit**
+`@chessviewer-org/chess-viewer` is a **dependency-free chess diagram toolkit**
 that runs in both Node.js and the browser. It parses and edits FEN positions,
 renders self-contained SVG diagrams, and provides color, theme, image, and DPI
 utilities. It powers [chessvision.org](https://chessvision.org) but ships as a

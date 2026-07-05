@@ -1,13 +1,13 @@
-# @chessvision-org/chess-vision
+# @chessviewer-org/chess-viewer
 
 Chess diagram generator and FEN utilities. Parse and edit FEN positions, render SVG board diagrams, manipulate boards, work with colors, board themes, presets, images, and history — in Node.js or the browser with **no dependencies and no DOM required**.
 
-[![npm version](https://img.shields.io/npm/v/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
-[![npm downloads](https://img.shields.io/npm/dm/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@chessvision-org/chess-vision)](https://bundlephobia.com/package/@chessvision-org/chess-vision)
-[![CI](https://github.com/chessvision-org/chess-vision-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/chessvision-org/chess-vision-utils/actions/workflows/ci.yml)
-[![types](https://img.shields.io/npm/types/@chessvision-org/chess-vision)](https://www.npmjs.com/package/@chessvision-org/chess-vision)
-[![license](https://img.shields.io/npm/l/@chessvision-org/chess-vision)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@chessviewer-org/chess-viewer)](https://www.npmjs.com/package/@chessviewer-org/chess-viewer)
+[![npm downloads](https://img.shields.io/npm/dm/@chessviewer-org/chess-viewer)](https://www.npmjs.com/package/@chessviewer-org/chess-viewer)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@chessviewer-org/chess-viewer)](https://bundlephobia.com/package/@chessviewer-org/chess-viewer)
+[![CI](https://github.com/chessviewer-org/chess-viewer-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/chessviewer-org/chess-viewer-utils/actions/workflows/ci.yml)
+[![types](https://img.shields.io/npm/types/@chessviewer-org/chess-viewer)](https://www.npmjs.com/package/@chessviewer-org/chess-viewer)
+[![license](https://img.shields.io/npm/l/@chessviewer-org/chess-viewer)](LICENSE)
 
 - **Zero dependencies** — nothing pulled into your tree.
 - **Universal** — runs in Node.js and the browser, no DOM, no canvas, no network.
@@ -19,11 +19,11 @@ Chess diagram generator and FEN utilities. Parse and edit FEN positions, render 
 ## Install
 
 ```bash
-npm install @chessvision-org/chess-vision
+npm install @chessviewer-org/chess-viewer
 # or
-pnpm add @chessvision-org/chess-vision
+pnpm add @chessviewer-org/chess-viewer
 # or
-yarn add @chessvision-org/chess-vision
+yarn add @chessviewer-org/chess-viewer
 ```
 
 **Requirements:** Node.js ≥ 18, or any modern browser.
@@ -33,7 +33,7 @@ yarn add @chessvision-org/chess-vision
 ## Quick start
 
 ```ts
-import { generateDiagram, parseFEN, validateFEN } from '@chessvision-org/chess-vision';
+import { generateDiagram, parseFEN, validateFEN } from '@chessviewer-org/chess-viewer';
 
 // Generate a self-contained SVG diagram
 const svg = generateDiagram({
@@ -57,7 +57,7 @@ document.getElementById('board').innerHTML = svg;
 The diagram below is real SVG produced by `generateDiagram` — no images, no canvas:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/chessvision-org/chess-vision-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Wood theme)">
+  <img src="https://raw.githubusercontent.com/chessviewer-org/chess-viewer-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Wood theme)">
 </p>
 
 ---
@@ -73,38 +73,38 @@ This package follows [Semantic Versioning](https://semver.org/):
 
 ```bash
 # Latest stable
-npm install @chessvision-org/chess-vision
+npm install @chessviewer-org/chess-viewer
 
 # Specific version
-npm install @chessvision-org/chess-vision@1.0.0
+npm install @chessviewer-org/chess-viewer@1.0.0
 
 # Latest minor of a major (e.g. 1.x)
-npm install @chessvision-org/chess-vision@^1.0.0
+npm install @chessviewer-org/chess-viewer@^1.0.0
 
 # Exact patch
-npm install @chessvision-org/chess-vision@~1.0.0
+npm install @chessviewer-org/chess-viewer@~1.0.0
 ```
 
 ### Check what version you have
 
 ```bash
-npm list @chessvision-org/chess-vision
+npm list @chessviewer-org/chess-viewer
 ```
 
 ### Check the latest version on npm
 
 ```bash
-npm view @chessvision-org/chess-vision version
+npm view @chessviewer-org/chess-viewer version
 # or all published versions:
-npm view @chessvision-org/chess-vision versions --json
+npm view @chessviewer-org/chess-viewer versions --json
 ```
 
 ### Upgrade to latest
 
 ```bash
-npm update @chessvision-org/chess-vision
+npm update @chessviewer-org/chess-viewer
 # or force latest:
-npm install @chessvision-org/chess-vision@latest
+npm install @chessviewer-org/chess-viewer@latest
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for what changed in each release.
@@ -118,7 +118,7 @@ See [CHANGELOG.md](CHANGELOG.md) for what changed in each release.
 Generates a self-contained SVG chess diagram. No DOM, no network requests.
 
 ```ts
-import { generateDiagram } from '@chessvision-org/chess-vision';
+import { generateDiagram } from '@chessviewer-org/chess-viewer';
 
 const svg = generateDiagram({
   fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
@@ -150,7 +150,7 @@ import {
   pieceToName,
   describeBoardPosition,
   FENParseError,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 // Parse FEN → 8×8 matrix
 const board = parseFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
@@ -196,7 +196,7 @@ import {
   toggleActiveColor,
   fenPlacementField,
   normalizeFEN,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 const record = parseFENRecord('rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 5 12');
 // → { board, activeColor: 'b', castling: 'KQkq', enPassant: 'e3', halfmove: 5, fullmove: 12 }
@@ -223,7 +223,7 @@ import {
   getPieceAt, setPieceAt, removePieceAt, movePiece,
   flipBoard, listPieces, countPieces,
   materialBalance, findKing, hasBothKings,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 const board = parseFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 
@@ -252,7 +252,7 @@ import {
   getPieceSet, pieceSetsByPopularity,
   getQualityPreset,
   themeContrast, themeCoordinateColor,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 getBoardTheme('ocean');             // → { name: 'Ocean', light: '#c9e4f5', dark: '#4a90a4' }
 listThemeIds();                     // → ['classic', 'brown', 'wood', …]
@@ -275,7 +275,7 @@ Read raster dimensions straight from PNG/JPEG headers (no decoding, no DOM) and
 compute physical print sizes — pairs naturally with `changeDPI`.
 
 ```ts
-import { readImageDimensions, physicalSize } from '@chessvision-org/chess-vision';
+import { readImageDimensions, physicalSize } from '@chessviewer-org/chess-viewer';
 
 const bytes = new Uint8Array(await blob.arrayBuffer());
 readImageDimensions(bytes);         // → { width: 1200, height: 1200 } | null
@@ -297,7 +297,7 @@ import {
   DEFAULT_DARK_SQUARE,
   STARTING_FEN,
   EMPTY_FEN,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 // 20 built-in board color themes
 BOARD_THEMES.classic   // { name: 'Classic', light: '#f0d9b5', dark: '#b58863' }
@@ -329,7 +329,7 @@ import {
   relativeLuminance,
   contrastRatio,
   bestTextColor,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 hexToRgb('#b58863')   // → { r: 181, g: 136, b: 99 }
 rgbToHex(181, 136, 99) // → '#b58863'
@@ -352,7 +352,7 @@ import {
   getSquareBounds,
   isLightSquare,
   getCoordinateParams,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 squareToIndices('e4')    // → [4, 4]  (row 0 = rank 8)
 indicesToSquare(4, 4)    // → 'e4'
@@ -378,7 +378,7 @@ import {
   applyFilters,
   mergeById,
   convertToArchivedEntry,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 const entry = createHistoryEntry(
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -406,7 +406,7 @@ import {
   sanitizeFileName,
   sanitizeInput,
   safeJSONParse,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 
 isValidHexColor('#f0d9b5')      // → true
 isValidHexColor('red')          // → false
@@ -426,7 +426,7 @@ safeJSONParse('bad json', {})  // → {}  (fallback, no throw)
 ### DPI encoding
 
 ```ts
-import { changeDPI } from '@chessvision-org/chess-vision';
+import { changeDPI } from '@chessviewer-org/chess-viewer';
 
 // Rewrite DPI metadata in a PNG or JPEG blob
 const correctedBlob = await changeDPI(originalBlob, 300, 'png');
@@ -438,7 +438,7 @@ const correctedJpeg = await changeDPI(originalBlob, 150, 'jpeg');
 ### Inline piece SVGs
 
 ```ts
-import { getPieceSVG, PIECES } from '@chessvision-org/chess-vision';
+import { getPieceSVG, PIECES } from '@chessviewer-org/chess-viewer';
 
 getPieceSVG('K')   // → '<svg …>…</svg>'  (white king, CBurnett style)
 getPieceSVG('k')   // → '<svg …>…</svg>'  (black king)
@@ -473,7 +473,7 @@ import type {
   CoordinateParams,
   SquareBounds,
   ImageDimensions,
-} from '@chessvision-org/chess-vision';
+} from '@chessviewer-org/chess-viewer';
 ```
 
 ---
@@ -485,7 +485,7 @@ import type {
 - [Changelog](CHANGELOG.md) — what changed in each release.
 - [Contributing](CONTRIBUTING.md) — how to propose and submit changes.
 - [Security policy](SECURITY.md) — how to report a vulnerability.
-- [Discussions](https://github.com/chessvision-org/chess-vision-utils/discussions) — questions and ideas.
+- [Discussions](https://github.com/chessviewer-org/chess-viewer-utils/discussions) — questions and ideas.
 
 ---
 

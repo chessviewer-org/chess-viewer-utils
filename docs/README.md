@@ -1,6 +1,6 @@
 # Documentation
 
-Developer documentation for `@chessvision-org/chess-vision`.
+Developer documentation for `@chessviewer-org/chess-viewer`.
 
 For installation and a quick-start, see the [project README](../README.md).
 For the public API surface, see the [API reference](../README.md#api-reference).

@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes the direction of `@chessvision-org/chess-vision`. It is a
+This roadmap describes the direction of `@chessviewer-org/chess-viewer`. It is a
 guide, not a contract — priorities shift with feedback and contributions.
 Anything tracked here lives as a GitHub issue with the **`status: roadmap`**
 label and is grouped under the matching [milestone](../../milestones).

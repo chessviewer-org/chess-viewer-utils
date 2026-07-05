@@ -7,7 +7,7 @@ HTML, or rasterize downstream.
 ## Basic render
 
 ```ts
-import { generateDiagram } from '@chessvision-org/chess-vision';
+import { generateDiagram } from '@chessviewer-org/chess-viewer';
 
 const svg = generateDiagram({
   fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -20,7 +20,7 @@ const svg = generateDiagram({
 Use a built-in theme instead of hand-picking colors:
 
 ```ts
-import { generateDiagram, getBoardTheme, themeCoordinateColor } from '@chessvision-org/chess-vision';
+import { generateDiagram, getBoardTheme, themeCoordinateColor } from '@chessviewer-org/chess-viewer';
 
 const theme = getBoardTheme('wood')!;
 

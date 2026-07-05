@@ -44,7 +44,7 @@ validation in a UI.
 ## Normalization
 
 ```ts
-import { normalizeFEN } from '@chessvision-org/chess-vision';
+import { normalizeFEN } from '@chessviewer-org/chess-viewer';
 
 normalizeFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 // 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1'
