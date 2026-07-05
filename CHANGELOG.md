@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@chessvision-org/chess-vision` are documented here.  
+All notable changes to `@chessviewer-org/chess-viewer` are documented here.  
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
@@ -18,7 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [1.0.0] - 2026-06-27
 
-Initial public release of the ChessVision utility toolkit.
+Initial public release of the ChessViewer utility toolkit.
 
 ### Added
 
@@ -44,5 +44,5 @@ Initial public release of the ChessVision utility toolkit.
 - Dual ESM + CJS build (`dist/index.js` + `dist/index.cjs`).
 - 107 unit tests with the Node.js native test runner.
 
-[Unreleased]: https://github.com/chessvision-org/chess-vision-utils/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/chessvision-org/chess-vision-utils/releases/tag/v1.0.0
+[Unreleased]: https://github.com/chessviewer-org/chess-viewer-utils/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/chessviewer-org/chess-viewer-utils/releases/tag/v1.0.0

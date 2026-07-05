@@ -57,7 +57,7 @@ document.getElementById('board').innerHTML = svg;
 The diagram below is real SVG produced by `generateDiagram` — no images, no canvas:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/chessviewer-org/chess-viewer-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-vision (Italian Game, Wood theme)">
+  <img src="https://raw.githubusercontent.com/chessviewer-org/chess-viewer-utils/main/assets/preview.svg" width="360" alt="Chess diagram rendered by chess-viewer (Italian Game, Wood theme)">
 </p>
 
 ---
