@@ -1,6 +1,6 @@
 {
   "name": "@chessviewer-org/chess-viewer",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Chess diagram toolkit — parse & edit FEN positions, manipulate boards, render SVG diagrams, board themes, color, image & DPI utilities. Works in Node.js and browsers.",
   "type": "module",
   "main": "./dist/index.cjs",
