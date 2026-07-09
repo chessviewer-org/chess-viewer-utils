@@ -22,15 +22,20 @@ Have an idea? Open a [discussion](../../discussions) or a
 - Configurable coordinate label color (`coordColor`).
 - Dual ESM + CJS build with full TypeScript types; zero dependencies.
 
+### v1.1.0 — Rendering options & drag-and-drop helpers
+
+- Highlight squares and last-move/threat arrows in `generateDiagram`.
+- Per-square custom colors and a check/checkmate glow indicator.
+- Pixel ↔ square hit-testing (`pointToSquare`, `squareToPoint`) so a UI can
+  build drag-and-drop or click-to-move on top of the board.
+- Pure move helpers for drag interactions: `applyDragMove`, `applyDragRemove`,
+  `applyPaletteDrop`, `resolveClick`.
+- `coordStyle` option (`'border'` | `'inner'`) — inner-board coordinate
+  placement, drawn in the square's own colors like lichess/chess.com.
+
 ---
 
 ## Planned
-
-### v1.1.0 — Rendering options
-
-- Highlight squares and last-move arrows in `generateDiagram`.
-- Per-square custom colors and check/checkmate indicators.
-- Optional inner-board coordinate placement (in addition to the border).
 
 ### v1.2.0 — More piece sets
 

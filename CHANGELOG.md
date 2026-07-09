@@ -13,6 +13,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
   label color. Accepts a hex string or the names `'white'` / `'black'` (e.g. the
   result of `themeCoordinateColor`), so coordinates stay legible on dark boards.
   Defaults to `'#000000'` for backward compatibility.
+- **Board annotations** — `generateDiagram` now takes an `annotations` option
+  for square highlights, move/threat arrows, and a check/checkmate glow.
+  New module `annotations.ts` exports `renderHighlightsSVG`, `renderArrowsSVG`,
+  `renderCheckIndicatorSVG`, `sanitizeAnnotations`, `isValidHighlight`, and
+  `isValidArrow`. Invalid entries (bad square names, malformed colors) are
+  dropped instead of throwing, so annotations from an untrusted source
+  (e.g. a shared position URL) render safely.
+- **Drag-and-drop helpers** — new module `interaction.ts` for building a board
+  UI on top of this library: `pointToSquare` / `squareToPoint` convert between
+  pixel coordinates and algebraic squares, `applyDragMove` moves a piece and
+  reports captures, `applyDragRemove` clears a square (drag-to-trash),
+  `applyPaletteDrop` places a piece from an external source, and
+  `resolveClick` implements tap-to-move (select, deselect, move) for
+  touch/accessibility fallbacks.
+- **`generateDiagram` `coordStyle` option** — `'border'` (default, unchanged)
+  or `'inner'` to draw rank/file labels inside the board's own squares,
+  lichess/chess.com style, instead of a separate border strip.
 
 ---
 
