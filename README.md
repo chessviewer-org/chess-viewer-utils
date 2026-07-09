@@ -124,14 +124,88 @@ const svg = generateDiagram({
   fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
   size: 480,            // board pixel size (default: 400)
   showCoords: true,     // show a/b/c… and 1/2/3… labels (default: false)
+  coordStyle: 'inner',  // 'border' (default) or 'inner' — labels drawn inside the squares
   flipped: false,       // show from Black's perspective (default: false)
   showFrame: false,     // thin outer frame (default: false)
   lightSquare: '#d4af7a',
   darkSquare: '#8b4513',
   coordColor: 'white',  // hex or 'white' | 'black' — keep coords legible on dark boards (default: '#000000')
   label: 'Starting position after 1.e4',  // aria-label (default: 'Chess position')
+  annotations: {
+    highlights: [{ square: 'e4', style: 'fill' }, { square: 'e2', style: 'ring' }],
+    arrows: [{ from: 'e2', to: 'e4', color: '#15781b' }],
+    check: { square: 'e8', type: 'check' },
+  },
 });
 // → '<svg xmlns="http://www.w3.org/2000/svg" …>…</svg>'
+```
+
+---
+
+### Board annotations
+
+Draw square highlights, move/threat arrows, and a check/checkmate glow on top
+of a diagram. Pass them straight to `generateDiagram` via `annotations`, or
+render the SVG fragments yourself if you're composing your own board.
+
+```ts
+import {
+  renderHighlightsSVG,
+  renderArrowsSVG,
+  renderCheckIndicatorSVG,
+  sanitizeAnnotations,
+} from '@chessviewer-org/chess-viewer';
+
+// bad squares, colors, or degenerate arrows are dropped, not thrown
+const clean = sanitizeAnnotations({
+  highlights: [{ square: 'e4' }, { square: 'not-a-square' }],
+  arrows: [{ from: 'e2', to: 'e4' }],
+  check: { square: 'e1', type: 'check' },
+});
+
+// each render function needs a square → pixel mapping (same one the board
+// itself is drawn with, so everything lines up)
+const toPixel = (square: string) => squareToPoint(square, { size: 400 });
+renderHighlightsSVG(clean.highlights ?? [], toPixel, 50);
+renderArrowsSVG(clean.arrows ?? [], toPixel, 50);
+renderCheckIndicatorSVG(clean.check!, toPixel, 50);
+```
+
+---
+
+### Drag & drop / click-to-move
+
+Pure helpers for building an interactive board on top of this library — hit
+testing, move application, and a tap-to-move fallback for touch/accessibility.
+
+```ts
+import {
+  parseFEN, STARTING_FEN,
+  pointToSquare, squareToPoint,
+  applyDragMove, applyDragRemove, applyPaletteDrop,
+  resolveClick,
+} from '@chessviewer-org/chess-viewer';
+
+const board = parseFEN(STARTING_FEN);
+
+// what square is under this pointer position?
+pointToSquare({ x: 210, y: 260 }, { size: 400 });  // → 'e3'
+
+// where should a square's ghost/preview element be drawn?
+squareToPoint('e4', { size: 400 });  // → { x: 200, y: 200, size: 50 }
+
+// drop a dragged piece onto a square
+const { board: next, moved, captured } = applyDragMove(board, 'e2', 'e4');
+
+// drag a piece off the board to delete it
+applyDragRemove(board, 'e2');
+
+// drop a piece from an outside palette/tray
+applyPaletteDrop(board, 'e4', 'Q');
+
+// tap-to-move: call on every square click with the current selection
+resolveClick('e4', 'e2', board);
+// → { kind: 'move', from: 'e2', to: 'e4' }
 ```
 
 ---
@@ -473,6 +547,14 @@ import type {
   CoordinateParams,
   SquareBounds,
   ImageDimensions,
+  SquareHighlight,
+  Arrow,
+  CheckIndicator,
+  BoardAnnotations,
+  BoardPoint,
+  HitTestOptions,
+  DragMoveResult,
+  ClickResolution,
 } from '@chessviewer-org/chess-viewer';
 ```
 
