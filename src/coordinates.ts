@@ -14,18 +14,12 @@ export interface SquareBounds {
   centerY: number;
 }
 
-/**
- * Calculates coordinate label display parameters based on board pixel size.
- */
 export function getCoordinateParams(boardSize: number): CoordinateParams {
   const borderSize = Math.round(Math.max(18, Math.min(800, boardSize * 0.05)));
   const fontSize = Math.round(Math.max(10, Math.min(480, borderSize * 0.72)));
   return { fontSize, borderSize, fontWeight: 600, offset: Math.round(borderSize / 2) };
 }
 
-/**
- * Calculates the bounding box and center coordinates for a board square.
- */
 export function getSquareBounds(
   rowIndex: number,
   colIndex: number,
@@ -44,27 +38,18 @@ export function isLightSquare(row: number, col: number): boolean {
   return (row + col) % 2 === 0;
 }
 
-/**
- * Returns actual [row, col] accounting for board flip.
- */
 export function getDisplayCoordinates(row: number, col: number, flipped: boolean): [number, number] {
   return [flipped ? 7 - row : row, flipped ? 7 - col : col];
 }
 
-/**
- * Converts a square name (e.g. 'e4') to [row, col] matrix indices (row 0 = rank 8).
- */
 export function squareToIndices(square: string): [number, number] | null {
   if (square.length !== 2) return null;
-  const file = square.charCodeAt(0) - 97; // 'a'=0
+  const file = square.charCodeAt(0) - 97;
   const rank = parseInt(square[1] ?? '', 10);
   if (file < 0 || file > 7 || isNaN(rank) || rank < 1 || rank > 8) return null;
   return [8 - rank, file];
 }
 
-/**
- * Converts matrix [row, col] indices to algebraic square name (e.g. 'e4').
- */
 export function indicesToSquare(row: number, col: number): string {
   const file = String.fromCharCode(97 + col);
   const rank = 8 - row;

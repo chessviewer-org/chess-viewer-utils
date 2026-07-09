@@ -39,11 +39,18 @@ import {
   getQualityPreset, themeContrast, themeCoordinateColor,
 } from './themes.ts';
 import { readImageDimensions, physicalSize } from './image.ts';
+import {
+  renderHighlightsSVG, renderArrowsSVG, renderCheckIndicatorSVG,
+  sanitizeAnnotations, isValidHighlight, isValidArrow,
+} from './annotations.ts';
+import {
+  pointToSquare, squareToPoint, applyDragMove, applyDragRemove,
+  applyPaletteDrop, resolveClick,
+} from './interaction.ts';
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const START_POS = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
-// ─── FEN ──────────────────────────────────────────────────────────────────────
 
 test('parseFEN: starting position', () => {
   const b = parseFEN(START_FEN);
@@ -144,7 +151,6 @@ test('pieceToName', () => {
   assert.equal(pieceToName('?'), '?');
 });
 
-// ─── PIECES ───────────────────────────────────────────────────────────────────
 
 test('getPieceSVG: all 12 pieces return SVG', () => {
   for (const p of ['P','N','B','R','Q','K','p','n','b','r','q','k']) {
@@ -158,7 +164,6 @@ test('getPieceSVG: null for invalid', () => {
   assert.equal(getPieceSVG(''), null);
 });
 
-// ─── SVG DIAGRAM ──────────────────────────────────────────────────────────────
 
 test('generateDiagram: valid SVG', () => {
   const svg = generateDiagram({ fen: START_FEN });
@@ -224,6 +229,22 @@ test('generateDiagram: invalid coordinate color falls back to black', () => {
   assert.ok(svg.includes('fill="#000000"'));
 });
 
+test('generateDiagram: inner coordinate style draws labels without a border', () => {
+  const bordered = generateDiagram({ fen: START_FEN, showCoords: true, coordStyle: 'border' });
+  const inner = generateDiagram({ fen: START_FEN, showCoords: true, coordStyle: 'inner' });
+  assert.ok(inner.includes('>a<'));
+  assert.ok(inner.includes('>8<'));
+  assert.notEqual(bordered, inner);
+  const innerWidthMatch = inner.match(/width="(\d+)"/);
+  assert.equal(innerWidthMatch?.[1], '400');
+});
+
+test('generateDiagram: inner coordinates default to border style', () => {
+  const withoutStyle = generateDiagram({ fen: START_FEN, showCoords: true });
+  const withBorderStyle = generateDiagram({ fen: START_FEN, showCoords: true, coordStyle: 'border' });
+  assert.equal(withoutStyle, withBorderStyle);
+});
+
 test('generateDiagram: coordColor accepts "white"/"black" names', () => {
   const white = generateDiagram({ fen: START_FEN, showCoords: true, coordColor: 'white' });
   assert.ok(white.includes('fill="#ffffff"'));
@@ -231,7 +252,6 @@ test('generateDiagram: coordColor accepts "white"/"black" names', () => {
   assert.ok(black.includes('fill="#000000"'));
 });
 
-// ─── COLORS ───────────────────────────────────────────────────────────────────
 
 test('hexToRgb: known values', () => {
   assert.deepEqual(hexToRgb('#ff0000'), { r: 255, g: 0, b: 0 });
@@ -280,7 +300,6 @@ test('bestTextColor: dark bg → white, light bg → black', () => {
   assert.equal(bestTextColor('#ffffff'), 'black');
 });
 
-// ─── VALIDATION ───────────────────────────────────────────────────────────────
 
 test('safeJSONParse: valid', () => {
   assert.deepEqual(safeJSONParse<{a:number}>('{"a":1}', {a:0}), {a:1});
@@ -292,9 +311,9 @@ test('safeJSONParse: invalid falls back', () => {
 
 test('safeJSONParse: prototype pollution blocked', () => {
   const r = safeJSONParse<Record<string,unknown>>('{"__proto__":{"evil":true}}', {});
-  // The key is dropped during parsing — result is an empty object, not undefined
+  // dropped
   assert.equal(Object.prototype.hasOwnProperty.call(r, '__proto__'), false);
-  // Critically: prototype is not poisoned
+  // not poisoned
   assert.equal(({} as Record<string,unknown>)['evil'], undefined);
 });
 
@@ -325,7 +344,6 @@ test('sanitizeInput: escapes HTML', () => {
   assert.equal(sanitizeInput('<b>bold</b>'), '&lt;b&gt;bold&lt;&#x2F;b&gt;');
 });
 
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
 test('constants: defaults and collections', () => {
   assert.equal(DEFAULT_LIGHT_SQUARE, '#f0d9b5');
@@ -354,7 +372,6 @@ test('QUALITY_PRESETS: valid structure', () => {
   }
 });
 
-// ─── HISTORY ──────────────────────────────────────────────────────────────────
 
 test('createHistoryEntry: shape', () => {
   const e = createHistoryEntry(START_FEN, 'manual');
@@ -449,7 +466,6 @@ test('sortArchivedByArchiveDate: newest first', () => {
   assert.equal(sorted[0]!.id, e2.id);
 });
 
-// ─── COORDINATES ──────────────────────────────────────────────────────────────
 
 test('getCoordinateParams: minimum font size', () => {
   const p = getCoordinateParams(400);
@@ -502,7 +518,6 @@ test('indicesToSquare: round-trip', () => {
   assert.equal(indicesToSquare(7, 7), 'h1');
 });
 
-// ─── FEN record ─────────────────────────────────────────────────────────────
 
 test('parseFENRecord: full starting record', () => {
   const r = parseFENRecord(START_FEN);
@@ -574,7 +589,6 @@ test('normalizeFEN: completes a placement-only string', () => {
   assert.equal(normalizeFEN(START_FEN), START_FEN);
 });
 
-// ─── Board manipulation ─────────────────────────────────────────────────────
 
 test('cloneBoard: independent copy', () => {
   const b = parseFEN(START_POS);
@@ -654,7 +668,6 @@ test('hasBothKings: start vs empty', () => {
   assert.equal(hasBothKings(createEmptyBoard()), false);
 });
 
-// ─── Themes & presets ───────────────────────────────────────────────────────
 
 test('getBoardTheme: known and unknown', () => {
   assert.equal(getBoardTheme('classic')?.name, 'Classic');
@@ -691,7 +704,6 @@ test('themeCoordinateColor: returns black or white', () => {
   assert.ok(['black', 'white'].includes(themeCoordinateColor(theme)));
 });
 
-// ─── Image helpers ──────────────────────────────────────────────────────────
 
 test('readImageDimensions: reads a PNG IHDR', () => {
   const png = new Uint8Array(24);
@@ -724,4 +736,176 @@ test('physicalSize: pixels to inches and mm', () => {
   assert.equal(inches, 2);
   assert.equal(Math.round(mm), 51);
   assert.deepEqual(physicalSize(600, 0), { inches: 0, mm: 0 });
+});
+
+
+test('isValidHighlight: accepts valid, rejects bad square/color/style', () => {
+  assert.equal(isValidHighlight({ square: 'e4' }), true);
+  assert.equal(isValidHighlight({ square: 'e4', color: '#ff0000', style: 'ring' }), true);
+  assert.equal(isValidHighlight({ square: 'z9' }), false);
+  assert.equal(isValidHighlight({ square: 'e4', color: 'red' }), false);
+  assert.equal(isValidHighlight({ square: 'e4', style: 'glow' as never }), false);
+});
+
+test('isValidArrow: accepts valid, rejects bad squares/degenerate/color', () => {
+  assert.equal(isValidArrow({ from: 'e2', to: 'e4' }), true);
+  assert.equal(isValidArrow({ from: 'e2', to: 'e2' }), false);
+  assert.equal(isValidArrow({ from: 'e2', to: 'z9' }), false);
+  assert.equal(isValidArrow({ from: 'e2', to: 'e4', color: 'not-a-color' }), false);
+});
+
+test('sanitizeAnnotations: drops invalid entries, keeps valid ones', () => {
+  const result = sanitizeAnnotations({
+    highlights: [{ square: 'e4' }, { square: 'bad' }],
+    arrows: [{ from: 'e2', to: 'e4' }, { from: 'a1', to: 'a1' }],
+    check: { square: 'e1' },
+  });
+  assert.equal(result.highlights?.length, 1);
+  assert.equal(result.arrows?.length, 1);
+  assert.equal(result.check?.square, 'e1');
+});
+
+test('sanitizeAnnotations: omits empty keys entirely', () => {
+  const result = sanitizeAnnotations({ highlights: [{ square: 'bad' }] });
+  assert.equal(result.highlights, undefined);
+  assert.deepEqual(result, {});
+});
+
+test('renderHighlightsSVG: fill and ring styles produce markup', () => {
+  const toPixel = () => ({ x: 0, y: 0 });
+  const fillSvg = renderHighlightsSVG([{ square: 'e4', style: 'fill' }], toPixel, 50);
+  assert.match(fillSvg, /<rect/);
+  assert.match(fillSvg, /fill-opacity="0.55"/);
+  const ringSvg = renderHighlightsSVG([{ square: 'e4', style: 'ring' }], toPixel, 50);
+  assert.match(ringSvg, /stroke=/);
+  assert.equal(renderHighlightsSVG([{ square: 'bad' }], toPixel, 50), '');
+});
+
+test('renderArrowsSVG: produces a line and marker per valid arrow', () => {
+  const toPixel = (sq: string) => (sq === 'e2' ? { x: 0, y: 50 } : { x: 0, y: 0 });
+  const svg = renderArrowsSVG([{ from: 'e2', to: 'e4' }], toPixel, 50);
+  assert.match(svg, /<line/);
+  assert.match(svg, /<marker/);
+  assert.equal(renderArrowsSVG([{ from: 'e2', to: 'e2' }], toPixel, 50), '');
+});
+
+test('renderCheckIndicatorSVG: produces a radial gradient and circle', () => {
+  const toPixel = () => ({ x: 0, y: 0 });
+  const svg = renderCheckIndicatorSVG({ square: 'e1', type: 'check' }, toPixel, 50);
+  assert.match(svg, /radialGradient/);
+  assert.match(svg, /<circle/);
+  assert.equal(renderCheckIndicatorSVG({ square: 'bad' }, toPixel, 50), '');
+});
+
+test('generateDiagram: renders with annotations without throwing', () => {
+  const svg = generateDiagram({
+    fen: START_FEN,
+    annotations: {
+      highlights: [{ square: 'e2', style: 'fill' }, { square: 'e4', style: 'ring' }],
+      arrows: [{ from: 'e2', to: 'e4' }],
+      check: { square: 'e8', type: 'check' },
+    },
+  });
+  assert.match(svg, /<svg/);
+  assert.match(svg, /<marker/);
+  assert.match(svg, /radialGradient/);
+});
+
+
+test('pointToSquare: maps pixel to algebraic square', () => {
+  assert.equal(pointToSquare({ x: 10, y: 10 }, { size: 400 }), 'a8');
+  assert.equal(pointToSquare({ x: 390, y: 390 }, { size: 400 }), 'h1');
+  assert.equal(pointToSquare({ x: 210, y: 260 }, { size: 400 }), 'e3');
+});
+
+test('pointToSquare: respects flipped board', () => {
+  assert.equal(pointToSquare({ x: 10, y: 10 }, { size: 400, flipped: true }), 'h1');
+});
+
+test('pointToSquare: respects offset and returns null outside bounds', () => {
+  assert.equal(pointToSquare({ x: 110, y: 110 }, { size: 400, offsetX: 100, offsetY: 100 }), 'a8');
+  assert.equal(pointToSquare({ x: -5, y: 10 }, { size: 400 }), null);
+  assert.equal(pointToSquare({ x: 401, y: 10 }, { size: 400 }), null);
+});
+
+test('squareToPoint: inverse of pointToSquare', () => {
+  const bounds = squareToPoint('d4', { size: 400 });
+  assert.deepEqual(bounds, { x: 150, y: 200, size: 50 });
+  assert.equal(squareToPoint('z9', { size: 400 }), null);
+});
+
+test('squareToPoint <-> pointToSquare round-trip for every square', () => {
+  const files = 'abcdefgh';
+  for (const file of files) {
+    for (let rank = 1; rank <= 8; rank++) {
+      const square = `${file}${rank}`;
+      const bounds = squareToPoint(square, { size: 400 });
+      assert.ok(bounds);
+      const center = { x: bounds.x + bounds.size / 2, y: bounds.y + bounds.size / 2 };
+      assert.equal(pointToSquare(center, { size: 400 }), square);
+    }
+  }
+});
+
+test('applyDragMove: moves a piece and reports capture', () => {
+  const board = parseFEN(START_FEN);
+  const result = applyDragMove(board, 'e2', 'e4');
+  assert.equal(result.moved, true);
+  assert.equal(result.captured, null);
+  assert.equal(result.board[4]?.[4], 'P');
+  assert.equal(result.board[6]?.[4], '');
+});
+
+test('applyDragMove: reports the captured piece', () => {
+  let board = setPieceAt(parseFEN(START_FEN), 'e4', 'P');
+  board = setPieceAt(board, 'd5', 'p');
+  const result = applyDragMove(board, 'e4', 'd5');
+  assert.equal(result.moved, true);
+  assert.equal(result.captured, 'p');
+});
+
+test('applyDragMove: no-op when source is empty or from === to', () => {
+  const board = parseFEN(START_FEN);
+  const result1 = applyDragMove(board, 'e4', 'e5');
+  assert.equal(result1.moved, false);
+  assert.equal(result1.board, board);
+  const result2 = applyDragMove(board, 'e2', 'e2');
+  assert.equal(result2.moved, false);
+});
+
+test('applyDragRemove: clears the source square', () => {
+  const board = parseFEN(START_FEN);
+  const result = applyDragRemove(board, 'e2');
+  assert.equal(result[6]?.[4], '');
+});
+
+test('applyPaletteDrop: places a piece from an external source', () => {
+  const board = createEmptyBoard();
+  const result = applyPaletteDrop(board, 'e4', 'Q');
+  assert.equal(result[4]?.[4], 'Q');
+});
+
+test('resolveClick: selects an occupied square when nothing is selected', () => {
+  const board = parseFEN(START_FEN);
+  assert.deepEqual(resolveClick('e2', null, board), { kind: 'select', square: 'e2' });
+});
+
+test('resolveClick: clicking empty square with nothing selected deselects', () => {
+  const board = parseFEN(START_FEN);
+  assert.deepEqual(resolveClick('e4', null, board), { kind: 'deselect' });
+});
+
+test('resolveClick: clicking the selected square again deselects', () => {
+  const board = parseFEN(START_FEN);
+  assert.deepEqual(resolveClick('e2', 'e2', board), { kind: 'deselect' });
+});
+
+test('resolveClick: clicking another occupied square retargets selection', () => {
+  const board = parseFEN(START_FEN);
+  assert.deepEqual(resolveClick('d2', 'e2', board), { kind: 'select', square: 'd2' });
+});
+
+test('resolveClick: clicking an empty square completes a move', () => {
+  const board = parseFEN(START_FEN);
+  assert.deepEqual(resolveClick('e4', 'e2', board), { kind: 'move', from: 'e2', to: 'e4' });
 });

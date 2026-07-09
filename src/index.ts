@@ -1,4 +1,3 @@
-// FEN parsing & board utilities
 export {
   parseFEN,
   validateFEN,
@@ -16,7 +15,6 @@ export {
   type ValidationResult,
 } from './fen.js';
 
-// Full FEN record parsing & serialization (all six fields)
 export {
   parseFENRecord,
   buildFENRecord,
@@ -27,7 +25,6 @@ export {
   type ActiveColor,
 } from './fen-record.js';
 
-// Pure board manipulation
 export {
   cloneBoard,
   getPieceAt,
@@ -44,13 +41,36 @@ export {
   type PiecePlacement,
 } from './board.js';
 
-// SVG diagram generator
 export { generateDiagram, type DiagramOptions } from './svg.js';
 
-// Inline piece SVGs (CBurnett / Lichess style)
+export {
+  renderHighlightsSVG,
+  renderArrowsSVG,
+  renderCheckIndicatorSVG,
+  sanitizeAnnotations,
+  isValidHighlight,
+  isValidArrow,
+  type SquareHighlight,
+  type Arrow,
+  type CheckIndicator,
+  type BoardAnnotations,
+} from './annotations.js';
+
+export {
+  pointToSquare,
+  squareToPoint,
+  applyDragMove,
+  applyDragRemove,
+  applyPaletteDrop,
+  resolveClick,
+  type BoardPoint,
+  type HitTestOptions,
+  type DragMoveResult,
+  type ClickResolution,
+} from './interaction.js';
+
 export { PIECES, getPieceSVG } from './pieces.js';
 
-// Color utilities
 export {
   hexToRgb,
   rgbToHex,
@@ -63,7 +83,6 @@ export {
   bestTextColor,
 } from './colors.js';
 
-// Input sanitization & validation helpers
 export {
   safeJSONParse,
   sanitizeFileName,
@@ -73,7 +92,6 @@ export {
   isRecord,
 } from './validation.js';
 
-// Board themes, piece sets, quality presets, constants
 export {
   DEFAULT_LIGHT_SQUARE,
   DEFAULT_DARK_SQUARE,
@@ -89,7 +107,6 @@ export {
   type QualityPreset,
 } from './constants.js';
 
-// History types & pure utilities
 export {
   calculateStatus,
   createHistoryEntry,
@@ -110,7 +127,6 @@ export {
   type PartitionResult,
 } from './history.js';
 
-// Coordinate math
 export {
   getCoordinateParams,
   getSquareBounds,
@@ -122,10 +138,8 @@ export {
   type SquareBounds,
 } from './coordinates.js';
 
-// DPI encoder (PNG pHYs / JPEG JFIF rewrite — Node.js + browser)
 export { changeDPI } from './dpi.js';
 
-// Theme, piece-set & quality-preset lookups
 export {
   getBoardTheme,
   listThemeIds,
@@ -136,7 +150,6 @@ export {
   themeCoordinateColor,
 } from './themes.js';
 
-// Image header reading (dimensions) & physical print sizing
 export {
   readImageDimensions,
   physicalSize,

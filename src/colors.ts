@@ -56,9 +56,6 @@ export function hsvToHex(h: number, s: number, v: number): string {
   return rgbToHex(r, g, b);
 }
 
-/**
- * Returns relative luminance of a hex color (WCAG 2.1 formula).
- */
 export function relativeLuminance(hex: string): number {
   const { r, g, b } = hexToRgb(hex);
   const toLinear = (c: number): number => {
@@ -68,10 +65,6 @@ export function relativeLuminance(hex: string): number {
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 
-/**
- * Returns WCAG 2.1 contrast ratio between two hex colors.
- * Range: 1 (no contrast) to 21 (black on white).
- */
 export function contrastRatio(hex1: string, hex2: string): number {
   const l1 = relativeLuminance(hex1);
   const l2 = relativeLuminance(hex2);
@@ -80,9 +73,6 @@ export function contrastRatio(hex1: string, hex2: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/**
- * Returns 'white' or 'black' — whichever has higher contrast against the given background.
- */
 export function bestTextColor(backgroundHex: string): 'white' | 'black' {
   const contrastWithWhite = contrastRatio(backgroundHex, '#ffffff');
   const contrastWithBlack = contrastRatio(backgroundHex, '#000000');

@@ -1,43 +1,19 @@
 import { parseFEN, boardToFEN, FENParseError, type BoardMatrix } from './fen.js';
 
-/** Side to move in a chess position. */
 export type ActiveColor = 'w' | 'b';
 
-/**
- * A fully parsed FEN record — all six fields of a standard FEN string.
- *
- * @see https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
- */
 export interface FENRecord {
-  /** Piece placement as an 8×8 matrix (rank 8 first). */
   board: BoardMatrix;
-  /** Side to move. */
   activeColor: ActiveColor;
-  /** Castling availability, e.g. `'KQkq'`, or `'-'` if none. */
   castling: string;
-  /** En passant target square, e.g. `'e3'`, or `'-'` if none. */
   enPassant: string;
-  /** Halfmove clock (moves since last capture or pawn advance). */
   halfmove: number;
-  /** Fullmove number (starts at 1, increments after Black's move). */
   fullmove: number;
 }
 
 const CASTLING_RE = /^(-|[KQkq]{1,4})$/;
 const EN_PASSANT_RE = /^(-|[a-h][36])$/;
 
-/**
- * Parses a complete FEN string into its six structured fields.
- *
- * Unlike {@link parseFEN}, which returns only the board, this parses the full
- * record including side to move, castling rights, en passant target, and clocks.
- * Missing trailing fields are filled with standard defaults
- * (`w`, `-`, `-`, `0`, `1`) so that piece-placement-only strings parse too.
- *
- * @param fen - Full or partial FEN string.
- * @returns The parsed {@link FENRecord}.
- * @throws {FENParseError} If any present field is malformed.
- */
 export function parseFENRecord(fen: string): FENRecord {
   if (!fen || typeof fen !== 'string') throw new FENParseError('Invalid FEN string');
 
@@ -76,13 +52,6 @@ export function parseFENRecord(fen: string): FENRecord {
   return { board, activeColor, castling, enPassant, halfmove, fullmove };
 }
 
-/**
- * Serializes a {@link FENRecord} back into a canonical six-field FEN string.
- *
- * @param record - The record to serialize. Any subset of metadata fields may be
- *   omitted; standard defaults are applied for those left out.
- * @returns A full FEN string.
- */
 export function buildFENRecord(record: Partial<FENRecord> & { board: BoardMatrix }): string {
   const {
     board,
@@ -95,26 +64,14 @@ export function buildFENRecord(record: Partial<FENRecord> & { board: BoardMatrix
   return `${boardToFEN(board)} ${activeColor} ${castling} ${enPassant} ${halfmove} ${fullmove}`;
 }
 
-/**
- * Returns a new FEN record with the side to move toggled.
- * Pure — does not mutate the input.
- */
 export function toggleActiveColor(record: FENRecord): FENRecord {
   return { ...record, activeColor: record.activeColor === 'w' ? 'b' : 'w' };
 }
 
-/**
- * Extracts only the piece-placement field from a full FEN string.
- * Returns the input trimmed if it has no whitespace.
- */
 export function fenPlacementField(fen: string): string {
   return (fen ?? '').trim().split(/\s+/)[0] ?? '';
 }
 
-/**
- * Normalizes a FEN string to its canonical six-field form, filling defaults
- * for any missing metadata. Throws if the placement field is invalid.
- */
 export function normalizeFEN(fen: string): string {
   return buildFENRecord(parseFENRecord(fen));
 }

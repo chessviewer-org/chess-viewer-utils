@@ -1,7 +1,3 @@
-/**
- * Rewrites the DPI metadata of a PNG or JPEG blob.
- * Works in both browser and Node.js (uses ArrayBuffer/Uint8Array, no DOM needed).
- */
 export async function changeDPI(blob: Blob, dpi: number, format: 'png' | 'jpeg'): Promise<Blob> {
   return format === 'png' ? changePngDPI(blob, dpi) : changeJpegDPI(blob, dpi);
 }

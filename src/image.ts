@@ -1,25 +1,15 @@
-/** Pixel dimensions of a raster image. */
 export interface ImageDimensions {
   width: number;
   height: number;
 }
 
-/**
- * Reads the pixel dimensions of a PNG or JPEG from its raw bytes, without
- * decoding the image. Works in Node.js and browsers (operates on
- * `Uint8Array` / `ArrayBuffer`, no DOM required).
- *
- * @param data - The image bytes.
- * @returns The image dimensions, or `null` if the format is unrecognized or the
- *   header is truncated.
- */
 export function readImageDimensions(data: Uint8Array | ArrayBuffer): ImageDimensions | null {
   const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
   return readPng(bytes) ?? readJpeg(bytes);
 }
 
 function readPng(bytes: Uint8Array): ImageDimensions | null {
-  // PNG signature + IHDR chunk: width/height are big-endian uint32 at offsets 16/20.
+  // signature
   if (bytes.length < 24) return null;
   const sig = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
   for (let i = 0; i < sig.length; i++) if (bytes[i] !== sig[i]) return null;
@@ -38,7 +28,7 @@ function readJpeg(bytes: Uint8Array): ImageDimensions | null {
     }
     const marker = bytes[pos + 1];
     if (marker === undefined) break;
-    // SOF markers carry the frame dimensions; skip the rest by their length.
+    // sof marker
     const isSOF =
       (marker >= 0xc0 && marker <= 0xc3) ||
       (marker >= 0xc5 && marker <= 0xc7) ||
@@ -59,13 +49,6 @@ function readJpeg(bytes: Uint8Array): ImageDimensions | null {
   return null;
 }
 
-/**
- * Computes the physical print size of an image at a given DPI.
- *
- * @param pixels - Dimension in pixels.
- * @param dpi - Target dots-per-inch.
- * @returns Size in inches and millimetres.
- */
 export function physicalSize(pixels: number, dpi: number): { inches: number; mm: number } {
   if (dpi <= 0) return { inches: 0, mm: 0 };
   const inches = pixels / dpi;

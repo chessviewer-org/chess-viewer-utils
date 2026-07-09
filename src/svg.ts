@@ -1,29 +1,25 @@
 import { parseFEN, type BoardMatrix } from './fen.js';
 import { getPieceSVG } from './pieces.js';
+import {
+  renderHighlightsSVG,
+  renderArrowsSVG,
+  renderCheckIndicatorSVG,
+  sanitizeAnnotations,
+  type BoardAnnotations,
+} from './annotations.js';
 
 export interface DiagramOptions {
-  /** FEN string (piece placement only or full FEN) */
   fen: string;
-  /** Light square color (hex, default '#f0d9b5') */
   lightSquare?: string;
-  /** Dark square color (hex, default '#b58863') */
   darkSquare?: string;
-  /** Board size in pixels (default 400) */
   size?: number;
-  /** Whether to show rank/file coordinates (default false) */
   showCoords?: boolean;
-  /** Whether to flip the board (black at bottom, default false) */
   flipped?: boolean;
-  /** Whether to show a thin outer frame (default false) */
   showFrame?: boolean;
-  /**
-   * Color of the rank/file coordinate labels. Accepts a hex string or the
-   * names `'white'` / `'black'` (e.g. the result of `themeCoordinateColor`).
-   * Default '#000000'.
-   */
   coordColor?: string;
-  /** Accessible label for the SVG (default 'Chess position') */
   label?: string;
+  annotations?: BoardAnnotations;
+  coordStyle?: 'border' | 'inner';
 }
 
 function escapeXml(value: string): string {
@@ -43,24 +39,12 @@ function safeColor(color: string | undefined, fallback: string): string {
   return fallback;
 }
 
-/**
- * Resolves a coordinate color. Accepts a hex string or the convenience names
- * `'white'` / `'black'` (as returned by `themeCoordinateColor`).
- */
 function resolveCoordColor(color: string | undefined, fallback: string): string {
   if (color === 'white') return '#ffffff';
   if (color === 'black') return '#000000';
   return safeColor(color, fallback);
 }
 
-/**
- * Generates a self-contained SVG chess diagram from a FEN string.
- * Works in Node.js and browsers — no DOM required.
- *
- * @param options - Diagram configuration
- * @returns SVG markup string
- * @throws If the FEN string is invalid
- */
 export function generateDiagram(options: DiagramOptions): string {
   const {
     fen,
@@ -69,16 +53,19 @@ export function generateDiagram(options: DiagramOptions): string {
     flipped = false,
     showFrame = false,
     label = 'Chess position',
+    coordStyle = 'border',
   } = options;
 
   const lightSquare = safeColor(options.lightSquare, '#f0d9b5');
   const darkSquare = safeColor(options.darkSquare, '#b58863');
   const coordColor = resolveCoordColor(options.coordColor, '#000000');
+  const showInnerCoords = showCoords && coordStyle === 'inner';
+  const showBorderCoords = showCoords && coordStyle !== 'inner';
 
   const board: BoardMatrix = parseFEN(fen);
 
   const COORD_RATIO = 0.05;
-  const coordBorder = showCoords ? Math.round(Math.max(18, size * COORD_RATIO)) : 0;
+  const coordBorder = showBorderCoords ? Math.round(Math.max(18, size * COORD_RATIO)) : 0;
   const frameThickness = showFrame ? Math.max(2, Math.round(size * 0.003)) : 0;
   const framePadding = showFrame ? frameThickness * 2 : 0;
 
@@ -129,6 +116,28 @@ export function generateDiagram(options: DiagramOptions): string {
     }
   }
 
+  const annotations = options.annotations ? sanitizeAnnotations(options.annotations) : null;
+
+  // square-to-pixel
+  const squareToPixel = (square: string): { x: number; y: number } | null => {
+    const file = square.charCodeAt(0) - 97;
+    const rank = parseInt(square[1] ?? '', 10);
+    if (file < 0 || file > 7 || isNaN(rank) || rank < 1 || rank > 8) return null;
+    const row = 8 - rank;
+    const col = file;
+    const visRow = flipped ? 7 - row : row;
+    const visCol = flipped ? 7 - col : col;
+    return { x: boardX + visCol * squareSize, y: boardY + visRow * squareSize };
+  };
+
+  if (annotations?.highlights) {
+    parts.push(renderHighlightsSVG(annotations.highlights, squareToPixel, squareSize));
+  }
+
+  if (annotations?.check) {
+    parts.push(renderCheckIndicatorSVG(annotations.check, squareToPixel, squareSize));
+  }
+
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const fenPiece = board[row]?.[col];
@@ -152,7 +161,11 @@ export function generateDiagram(options: DiagramOptions): string {
     }
   }
 
-  if (showCoords) {
+  if (annotations?.arrows) {
+    parts.push(renderArrowsSVG(annotations.arrows, squareToPixel, squareSize));
+  }
+
+  if (showBorderCoords) {
     const files = flipped
       ? ['h','g','f','e','d','c','b','a']
       : ['a','b','c','d','e','f','g','h'];
@@ -175,6 +188,40 @@ export function generateDiagram(options: DiagramOptions): string {
       const x = frameOffset + coordBorder * 0.5;
       const y = boardY + row * squareSize + squareSize / 2 + fontSize * 0.35;
       parts.push(`<text x="${x}" y="${y}" ${textAttrs}>${ranks[row]}</text>`);
+    }
+  }
+
+  if (showInnerCoords) {
+    const files = flipped
+      ? ['h','g','f','e','d','c','b','a']
+      : ['a','b','c','d','e','f','g','h'];
+    const ranks = flipped
+      ? ['1','2','3','4','5','6','7','8']
+      : ['8','7','6','5','4','3','2','1'];
+
+    const fontSize = Math.round(Math.max(8, squareSize * 0.18));
+    const fontFamily = "'Inter', system-ui, sans-serif";
+    const pad = fontSize * 0.5;
+
+    // files go along the bottom row, ranks go down the left column
+    for (let col = 0; col < 8; col++) {
+      const color = (7 + col) % 2 === 0 ? lightSquare : darkSquare;
+      const x = boardX + col * squareSize + pad;
+      const y = boardY + size - pad;
+      parts.push(
+        `<text x="${x}" y="${y}" font-family="${escapeXml(fontFamily)}" font-size="${fontSize}" ` +
+        `font-weight="700" fill="${escapeXml(color)}" text-anchor="start">${files[col]}</text>`
+      );
+    }
+
+    for (let row = 0; row < 8; row++) {
+      const color = row % 2 === 0 ? lightSquare : darkSquare;
+      const x = boardX + squareSize - pad;
+      const y = boardY + row * squareSize + pad + fontSize * 0.7;
+      parts.push(
+        `<text x="${x}" y="${y}" font-family="${escapeXml(fontFamily)}" font-size="${fontSize}" ` +
+        `font-weight="700" fill="${escapeXml(color)}" text-anchor="end">${ranks[row]}</text>`
+      );
     }
   }
 
