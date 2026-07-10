@@ -5,8 +5,10 @@ import {
   renderArrowsSVG,
   renderCheckIndicatorSVG,
   sanitizeAnnotations,
+  escapeXml,
   type BoardAnnotations,
 } from './annotations.js';
+import { isValidHexColor } from './validation.js';
 
 export interface DiagramOptions {
   fen: string;
@@ -20,18 +22,6 @@ export interface DiagramOptions {
   label?: string;
   annotations?: BoardAnnotations;
   coordStyle?: 'border' | 'inner';
-}
-
-function escapeXml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function isValidHexColor(color: string): boolean {
-  return /^#[0-9A-Fa-f]{6}$/.test(color);
 }
 
 function safeColor(color: string | undefined, fallback: string): string {
@@ -118,7 +108,6 @@ export function generateDiagram(options: DiagramOptions): string {
 
   const annotations = options.annotations ? sanitizeAnnotations(options.annotations) : null;
 
-  // square-to-pixel
   const squareToPixel = (square: string): { x: number; y: number } | null => {
     const file = square.charCodeAt(0) - 97;
     const rank = parseInt(square[1] ?? '', 10);
@@ -203,7 +192,7 @@ export function generateDiagram(options: DiagramOptions): string {
     const fontFamily = "'Inter', system-ui, sans-serif";
     const pad = fontSize * 0.5;
 
-    // files go along the bottom row, ranks go down the left column
+    // files sit along the bottom row, ranks go down the left column
     for (let col = 0; col < 8; col++) {
       const color = (7 + col) % 2 === 0 ? lightSquare : darkSquare;
       const x = boardX + col * squareSize + pad;

@@ -1,6 +1,7 @@
 import { squareToIndices } from './coordinates.js';
 import { isValidHexColor } from './validation.js';
 
+// Types
 export interface SquareHighlight {
   square: string;
   color?: string;
@@ -24,6 +25,7 @@ export interface BoardAnnotations {
   check?: CheckIndicator;
 }
 
+// Constants
 const DEFAULT_HIGHLIGHT_COLOR = '#ffeb3b';
 const DEFAULT_ARROW_COLOR = '#15781b';
 const CHECK_COLOR = '#e8412c';
@@ -46,7 +48,6 @@ export function isValidArrow(arrow: Arrow): boolean {
   return true;
 }
 
-// sanitize
 export function sanitizeAnnotations(annotations: BoardAnnotations): BoardAnnotations {
   const highlights = (annotations.highlights ?? []).filter(isValidHighlight);
   const arrows = (annotations.arrows ?? []).filter(isValidArrow);
@@ -61,7 +62,7 @@ export function sanitizeAnnotations(annotations: BoardAnnotations): BoardAnnotat
   return result;
 }
 
-function escapeXml(value: string): string {
+export function escapeXml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -122,7 +123,7 @@ export function renderArrowsSVG(
     const x1 = from.x + half;
     const y1 = from.y + half;
 
-    // shorten
+    // pull the tip back so it doesn't sit under the target piece
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const length = Math.hypot(dx, dy) || 1;

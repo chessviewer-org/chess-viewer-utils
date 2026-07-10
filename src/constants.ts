@@ -1,8 +1,10 @@
+// Constants
 export const DEFAULT_LIGHT_SQUARE = '#f0d9b5';
 export const DEFAULT_DARK_SQUARE = '#b58863';
 export const STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 export const EMPTY_FEN = '8/8/8/8/8/8/8/8 w - - 0 1';
 
+// Types
 export interface PieceSet {
   id: string;
   name: string;
@@ -47,6 +49,7 @@ export interface BoardTheme {
   dark: string;
 }
 
+// Board color presets
 export const BOARD_THEMES: Record<string, BoardTheme> = {
   classic:    { name: 'Classic',    light: '#f0d9b5', dark: '#b58863' },
   brown:      { name: 'Brown',      light: '#f0d9b5', dark: '#946f51' },
@@ -79,6 +82,7 @@ export interface QualityPreset {
   estimatedSize: string;
 }
 
+// Export quality presets (DPI + sizing)
 export const QUALITY_PRESETS: QualityPreset[] = [
   { value: 1, label: 'Print 1× (300 DPI)', description: 'Standard print resolution — 300 DPI at physical size', mode: 'print', forceCoordinateBorder: false, estimatedSize: '10-110 KB' },
   { value: 2, label: 'Print 2× (600 DPI)', description: 'High print resolution — 600 DPI at physical size', mode: 'print', forceCoordinateBorder: false, estimatedSize: '50-440 KB' },

@@ -9,7 +9,6 @@ export function readImageDimensions(data: Uint8Array | ArrayBuffer): ImageDimens
 }
 
 function readPng(bytes: Uint8Array): ImageDimensions | null {
-  // signature
   if (bytes.length < 24) return null;
   const sig = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
   for (let i = 0; i < sig.length; i++) if (bytes[i] !== sig[i]) return null;
@@ -28,7 +27,6 @@ function readJpeg(bytes: Uint8Array): ImageDimensions | null {
     }
     const marker = bytes[pos + 1];
     if (marker === undefined) break;
-    // sof marker
     const isSOF =
       (marker >= 0xc0 && marker <= 0xc3) ||
       (marker >= 0xc5 && marker <= 0xc7) ||

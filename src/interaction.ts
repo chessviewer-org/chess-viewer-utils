@@ -14,7 +14,6 @@ export interface HitTestOptions {
   offsetY?: number;
 }
 
-// hit-test
 export function pointToSquare(point: BoardPoint, options: HitTestOptions): string | null {
   const { size, flipped = false, offsetX = 0, offsetY = 0 } = options;
   const localX = point.x - offsetX;
@@ -25,7 +24,6 @@ export function pointToSquare(point: BoardPoint, options: HitTestOptions): strin
   const visCol = Math.floor(localX / squareSize);
   const visRow = Math.floor(localY / squareSize);
 
-  // flip
   const row = flipped ? 7 - visRow : visRow;
   const col = flipped ? 7 - visCol : visCol;
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
@@ -59,7 +57,6 @@ export interface DragMoveResult {
   captured: PieceSymbol | null;
 }
 
-// move
 export function applyDragMove(board: BoardMatrix, from: string, to: string): DragMoveResult {
   const piece = getPieceAt(board, from);
   if (!piece || from === to) {
@@ -82,7 +79,6 @@ export type ClickResolution =
   | { kind: 'deselect' }
   | { kind: 'move'; from: string; to: string };
 
-// tap-to-move
 export function resolveClick(
   clickedSquare: string,
   selected: string | null,

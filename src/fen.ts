@@ -1,3 +1,4 @@
+// Types
 export type PieceSymbol =
   | 'P' | 'N' | 'B' | 'R' | 'Q' | 'K'
   | 'p' | 'n' | 'b' | 'r' | 'q' | 'k'
@@ -10,6 +11,7 @@ export interface ValidationResult {
   errorMessage: string | null;
 }
 
+// Constants
 export const MAX_FEN_LENGTH = 93;
 
 const VALID_PIECES = new Set(['p','n','b','r','q','k','P','N','B','R','Q','K']);
@@ -24,6 +26,16 @@ export class FENParseError extends Error {
     super(message);
     this.name = 'FENParseError';
   }
+}
+
+function countRankSquares(rank: string): number | { badChar: string } {
+  let count = 0;
+  for (const char of rank) {
+    if (VALID_DIGITS.has(char)) count += parseInt(char, 10);
+    else if (VALID_PIECES.has(char)) count++;
+    else return { badChar: char };
+  }
+  return count;
 }
 
 export function parseFEN(fenString: string): BoardMatrix {
@@ -83,16 +95,8 @@ export function getFENValidationError(fen: string): string {
     for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
       const row = rows[rowIndex];
       if (row === undefined) continue;
-      let count = 0;
-      for (const char of row) {
-        if (VALID_DIGITS.has(char)) {
-          count += parseInt(char, 10);
-        } else if (VALID_PIECES.has(char)) {
-          count++;
-        } else {
-          return `Invalid piece character: ${char}`;
-        }
-      }
+      const count = countRankSquares(row);
+      if (typeof count !== 'number') return `Invalid piece character: ${count.badChar}`;
       if (count !== 8) return `Rank ${rowIndex + 1} has ${count} squares`;
     }
     return '';
@@ -136,23 +140,17 @@ export function validateFENDetailed(fen: string): ValidationResult {
   for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
     const row = rows[rowIndex];
     if (row === undefined) continue;
-    let squareCount = 0;
-    for (const char of row) {
-      if (VALID_DIGITS.has(char)) {
-        squareCount += parseInt(char, 10);
-      } else if (VALID_PIECES.has(char)) {
-        squareCount++;
-      } else {
-        return {
-          isValid: false,
-          errorMessage: `Error: Invalid character '${char}' in the piece placement field.`
-        };
-      }
-    }
-    if (squareCount !== 8) {
+    const count = countRankSquares(row);
+    if (typeof count !== 'number') {
       return {
         isValid: false,
-        errorMessage: `Error: Rank ${rowIndex + 1} has ${squareCount} squares instead of 8.`
+        errorMessage: `Error: Invalid character '${count.badChar}' in the piece placement field.`
+      };
+    }
+    if (count !== 8) {
+      return {
+        isValid: false,
+        errorMessage: `Error: Rank ${rowIndex + 1} has ${count} squares instead of 8.`
       };
     }
   }
@@ -222,6 +220,7 @@ export function isBoardEmpty(board: BoardMatrix): boolean {
   return board.every((row) => row.every((piece) => piece === ''));
 }
 
+// Piece names for the human-readable board description
 const PIECE_NAMES: Record<string, string> = {
   K: 'white king', Q: 'white queen', R: 'white rook',
   B: 'white bishop', N: 'white knight', P: 'white pawn',

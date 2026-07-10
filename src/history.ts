@@ -1,3 +1,4 @@
+// Types
 export type HistorySource = 'manual' | 'export' | 'drag';
 export type ArchiveSource = 'auto' | 'manual';
 export type FreshnessStatus = 'green' | 'yellow' | 'red';
@@ -29,6 +30,7 @@ export interface HistoryFilters {
   favoritesOnly?: boolean;
 }
 
+// Constants
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SEVEN_DAYS_MS = 7 * DAY_MS;
 const THIRTY_DAYS_MS = 30 * DAY_MS;

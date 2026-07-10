@@ -1,5 +1,3 @@
-export const MAX_FEN_LENGTH = 93;
-
 const PROTOTYPE_POISON_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 export function safeJSONParse<T>(jsonString: string | null | undefined, fallback: T): T {
