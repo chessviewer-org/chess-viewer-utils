@@ -6,6 +6,7 @@ export type SquareRef = string | readonly [number, number];
 function resolve(square: SquareRef): [number, number] | null {
   if (typeof square === 'string') return squareToIndices(square);
   const [row, col] = square;
+  if (!Number.isInteger(row) || !Number.isInteger(col)) return null;
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
   return [row, col];
 }
