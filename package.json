@@ -23,7 +23,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
     "dev": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --watch",
     "typecheck": "tsc --noEmit",
-    "test": "npx tsx --test src/index.test.ts",
+    "test": "npx tsx --test src/*.test.ts",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [

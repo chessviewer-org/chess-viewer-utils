@@ -69,6 +69,15 @@ export {
   type ClickResolution,
 } from './interaction.js';
 
+export {
+  createBoard,
+  type BoardApi,
+  type BoardConfig,
+  type BoardClassNames,
+  type BoardOrientation,
+  type BoardSquareRef,
+} from './board-dom.js';
+
 export { PIECES, getPieceSVG } from './pieces.js';
 
 export {
