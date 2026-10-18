@@ -7,6 +7,7 @@ import {
   FENParseError, pieceToName,
 } from './fen.ts';
 import { generateDiagram } from './svg.ts';
+import { boardOutlineWidth } from './pattern.ts';
 import { getPieceSVG } from './pieces.ts';
 import {
   hexToRgb, rgbToHex, rgbToHsv, hsvToRgb, hexToHsv, hsvToHex,
@@ -174,7 +175,7 @@ test('generateDiagram: valid SVG', () => {
 
 test('generateDiagram: piece-placement-only FEN', () => {
   const svg = generateDiagram({ fen: START_POS, size: 300 });
-  assert.ok(svg.includes('width="300"'));
+  assert.ok(svg.includes(`width="${300 + boardOutlineWidth(300) * 2}"`));
 });
 
 test('generateDiagram: with coordinates', () => {
@@ -236,7 +237,7 @@ test('generateDiagram: inner coordinate style draws labels without a border', ()
   assert.ok(inner.includes('>8<'));
   assert.notEqual(bordered, inner);
   const innerWidthMatch = inner.match(/width="(\d+)"/);
-  assert.equal(innerWidthMatch?.[1], '400');
+  assert.equal(innerWidthMatch?.[1], String(400 + boardOutlineWidth(400) * 2));
 });
 
 test('generateDiagram: inner coordinates default to border style', () => {

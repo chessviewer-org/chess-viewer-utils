@@ -9,6 +9,13 @@ import {
   type BoardAnnotations,
 } from './annotations.js';
 import { isValidHexColor } from './validation.js';
+import {
+  boardOutlineWidth,
+  hatchPatternSVG,
+  pieceHaloFilterSVG,
+  pieceHaloRadius,
+  type SquarePattern,
+} from './pattern.js';
 
 export interface DiagramOptions {
   fen: string;
@@ -22,7 +29,10 @@ export interface DiagramOptions {
   label?: string;
   annotations?: BoardAnnotations;
   coordStyle?: 'border' | 'inner';
+  squarePattern?: SquarePattern;
 }
+
+const PIECE_VIEWBOX = 45;
 
 function safeColor(color: string | undefined, fallback: string): string {
   if (color && isValidHexColor(color)) return color;
@@ -44,7 +54,9 @@ export function generateDiagram(options: DiagramOptions): string {
     showFrame = false,
     label = 'Chess position',
     coordStyle = 'border',
+    squarePattern = 'solid',
   } = options;
+  const hatched = squarePattern === 'hatched';
 
   const lightSquare = safeColor(options.lightSquare, '#f0d9b5');
   const darkSquare = safeColor(options.darkSquare, '#b58863');
@@ -59,10 +71,12 @@ export function generateDiagram(options: DiagramOptions): string {
   const frameThickness = showFrame ? Math.max(2, Math.round(size * 0.003)) : 0;
   const framePadding = showFrame ? frameThickness * 2 : 0;
 
-  const totalWidth = coordBorder + size + framePadding;
-  const totalHeight = size + coordBorder + framePadding;
-  const boardX = coordBorder + (showFrame ? frameThickness : 0);
-  const boardY = showFrame ? frameThickness : 0;
+  const outline = boardOutlineWidth(size);
+
+  const totalWidth = coordBorder + size + outline * 2 + framePadding;
+  const totalHeight = size + coordBorder + outline * 2 + framePadding;
+  const boardX = coordBorder + outline + (showFrame ? frameThickness : 0);
+  const boardY = outline + (showFrame ? frameThickness : 0);
   const squareSize = size / 8;
 
   const parts: string[] = [];
@@ -74,6 +88,12 @@ export function generateDiagram(options: DiagramOptions): string {
     `role="img" aria-label="${escapeXml(label)}">`
   );
   parts.push(`<title>${escapeXml(label)}</title>`);
+  if (hatched) {
+    parts.push(
+      `<defs>${hatchPatternSVG('cv-hatch', squareSize, boardX, boardY, escapeXml(darkSquare))}` +
+      `${pieceHaloFilterSVG('cv-halo', pieceHaloRadius(PIECE_VIEWBOX), escapeXml(lightSquare))}</defs>`
+    );
+  }
 
   if (showFrame) {
     const f = frameThickness;
@@ -85,24 +105,22 @@ export function generateDiagram(options: DiagramOptions): string {
     );
   }
 
-  const strokeW = Math.max(1, Math.round(size * 0.002));
-  const half = strokeW / 2;
   parts.push(
-    `<rect x="${boardX - half}" y="${boardY - half}" ` +
-    `width="${size + strokeW}" height="${size + strokeW}" ` +
-    `fill="none" stroke="#000000" stroke-width="${strokeW}"/>`
+    `<rect x="${boardX - outline}" y="${boardY - outline}" ` +
+    `width="${size + outline * 2}" height="${size + outline * 2}" fill="#000000"/>`
   );
 
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const visRow = flipped ? 7 - row : row;
       const visCol = flipped ? 7 - col : col;
-      const color = (row + col) % 2 === 0 ? lightSquare : darkSquare;
+      const isLight = (row + col) % 2 === 0;
+      const color = isLight || hatched ? lightSquare : darkSquare;
       const x = boardX + visCol * squareSize;
       const y = boardY + visRow * squareSize;
-      parts.push(
-        `<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" fill="${escapeXml(color)}"/>`
-      );
+      const rect = `<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" `;
+      parts.push(`${rect}fill="${escapeXml(color)}"/>`);
+      if (hatched && !isLight) parts.push(`${rect}fill="url(#cv-hatch)"/>`);
     }
   }
 
@@ -144,8 +162,11 @@ export function generateDiagram(options: DiagramOptions): string {
         .replace(/^<svg[^>]*>/, '')
         .replace(/<\/svg>$/, '');
 
+      const onHatch = hatched && (row + col) % 2 === 1;
       parts.push(
-        `<g transform="translate(${x},${y}) scale(${squareSize / 45})">${innerContent}</g>`
+        `<svg x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" viewBox="0 0 ${PIECE_VIEWBOX} ${PIECE_VIEWBOX}">` +
+        (onHatch ? `<g filter="url(#cv-halo)">${innerContent}</g>` : innerContent) +
+        `</svg>`
       );
     }
   }
@@ -168,7 +189,7 @@ export function generateDiagram(options: DiagramOptions): string {
 
     for (let col = 0; col < 8; col++) {
       const x = boardX + col * squareSize + squareSize / 2;
-      const y = boardY + size + coordBorder * 0.7;
+      const y = boardY + size + outline + coordBorder * 0.7;
       parts.push(`<text x="${x}" y="${y}" ${textAttrs}>${files[col]}</text>`);
     }
 
@@ -194,7 +215,7 @@ export function generateDiagram(options: DiagramOptions): string {
 
     // files sit along the bottom row, ranks go down the left column
     for (let col = 0; col < 8; col++) {
-      const color = (7 + col) % 2 === 0 ? lightSquare : darkSquare;
+      const color = hatched || (7 + col) % 2 !== 0 ? darkSquare : lightSquare;
       const x = boardX + col * squareSize + pad;
       const y = boardY + size - pad;
       parts.push(
@@ -204,7 +225,7 @@ export function generateDiagram(options: DiagramOptions): string {
     }
 
     for (let row = 0; row < 8; row++) {
-      const color = row % 2 === 0 ? lightSquare : darkSquare;
+      const color = hatched || row % 2 !== 0 ? darkSquare : lightSquare;
       const x = boardX + squareSize - pad;
       const y = boardY + row * squareSize + pad + fontSize * 0.7;
       parts.push(

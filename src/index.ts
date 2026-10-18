@@ -44,6 +44,23 @@ export {
 export { generateDiagram, type DiagramOptions } from './svg.js';
 
 export {
+  isSquarePattern,
+  hatchLineWidth,
+  hatchSegments,
+  hatchPatternSVG,
+  boardOutlineWidth,
+  pieceHaloRadius,
+  pieceHaloFilterSVG,
+  SQUARE_PATTERNS,
+  HATCH_DIVISIONS,
+  HATCH_LINE_RATIO,
+  PIECE_HALO_RATIO,
+  BOARD_OUTLINE_RATIO,
+  type SquarePattern,
+  type HatchSegment,
+} from './pattern.js';
+
+export {
   renderHighlightsSVG,
   renderArrowsSVG,
   renderCheckIndicatorSVG,
