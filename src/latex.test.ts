@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
 import {
+  LATEX_BOARD_SIZES,
+  LATEX_BOARD_SIZE_PT,
   LATEX_PACKAGES,
   LATEX_PACKAGE_META,
   generateBoardLatex,
@@ -347,6 +349,55 @@ describe('FEN handling', () => {
         fen: TACTIC_FEN,
         latexPackage: 'chessboard'
       }).includes(`setfen=${TACTIC_FEN}`)
+    );
+  });
+});
+
+describe('board size and side to move', () => {
+  test('normal size and visible mover add nothing', () => {
+    const skak = generateBoardLatex({ fen: START_FEN, boardSize: 'normal', showMover: true });
+    const board = generateBoardLatex({
+      fen: START_FEN,
+      latexPackage: 'chessboard',
+      boardSize: 'normal',
+      showMover: true
+    });
+    assert.ok(!/\\(tiny|small|large|normal)board/.test(skak));
+    assert.equal(board, `\\usepackage{chessboard}\n\\chessboard[setfen=${START_FEN}]`);
+  });
+
+  test('skak resizes the diagram and restores the normal size afterwards', () => {
+    const lines = generateBoardLatex({ fen: START_FEN, boardSize: 'small', showCoords: false }).split('\n');
+    assert.deepEqual(lines.slice(2), [
+      '\\notationoff',
+      '\\smallboard',
+      '\\showboard',
+      '\\normalboard',
+      '\\notationon'
+    ]);
+  });
+
+  test('chessboard maps each size to boardfontsize in points', () => {
+    for (const size of LATEX_BOARD_SIZES.filter((s) => s !== 'normal')) {
+      const latex = generateBoardLatex({ fen: START_FEN, latexPackage: 'chessboard', boardSize: size });
+      assert.ok(latex.includes(`boardfontsize=${LATEX_BOARD_SIZE_PT[size]}pt`));
+    }
+  });
+
+  test('chessboard hides the side-to-move marker on request', () => {
+    const latex = generateBoardLatex({ fen: START_FEN, latexPackage: 'chessboard', showMover: false });
+    assert.ok(latex.includes('showmover=false'));
+  });
+
+  test('skak ignores the mover switch because it needs PostScript', () => {
+    const latex = generateBoardLatex({ fen: START_FEN, showMover: false });
+    assert.ok(!latex.includes('mover'));
+  });
+
+  test('an unknown board size is rejected', () => {
+    assert.throws(
+      () => generateBoardLatex({ fen: START_FEN, boardSize: 'huge' as never }),
+      /unsupported board size "huge"/
     );
   });
 });

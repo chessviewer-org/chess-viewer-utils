@@ -81,8 +81,12 @@ export {
 export {
   generateBoardLatex,
   isLatexPackage,
+  isLatexBoardSize,
   LATEX_PACKAGES,
   LATEX_PACKAGE_META,
+  LATEX_BOARD_SIZES,
+  LATEX_BOARD_SIZE_PT,
+  type LatexBoardSize,
   type LatexPackage,
   type LatexOutputMode,
   type LatexPackageMeta,
