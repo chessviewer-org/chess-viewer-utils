@@ -18,6 +18,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ### Added
 
+- **LaTeX export** — new module `latex.ts` exports `generateBoardLatex`,
+  `isLatexPackage`, `LATEX_PACKAGES`, and `LATEX_PACKAGE_META`. Produces `skak`
+  or `chessboard` markup (snippet or compilable document) with board flip and
+  coordinate visibility carried over; the FEN is validated and allowlisted so
+  it cannot inject LaTeX commands.
 - **`generateDiagram` `coordColor` option** — configurable rank/file coordinate
   label color. Accepts a hex string or the names `'white'` / `'black'` (e.g. the
   result of `themeCoordinateColor`), so coordinates stay legible on dark boards.

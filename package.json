@@ -1,7 +1,7 @@
 {
   "name": "@chessviewer-org/chess-viewer",
   "version": "1.2.0",
-  "description": "Chess diagram toolkit — parse & edit FEN positions, manipulate boards, render SVG diagrams, board themes, color, image & DPI utilities. Works in Node.js and browsers.",
+  "description": "Chess diagram toolkit — parse & edit FEN positions, manipulate boards, render SVG diagrams, export LaTeX, board themes, color, image & DPI utilities. Works in Node.js and browsers.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -44,6 +44,8 @@
     "board-themes",
     "lichess",
     "dpi",
+    "latex",
+    "skak",
     "chessviewer",
     "typescript"
   ],

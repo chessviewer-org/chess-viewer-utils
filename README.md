@@ -509,6 +509,40 @@ const correctedJpeg = await changeDPI(originalBlob, 150, 'jpeg');
 
 ---
 
+### LaTeX export
+
+Turn a position into ready-to-paste markup for the `skak` or `chessboard`
+LaTeX packages. Board orientation and coordinate visibility carry over, and
+`mode: 'document'` wraps the diagram in a file that compiles as-is.
+
+```ts
+import { generateBoardLatex } from '@chessviewer-org/chess-viewer';
+
+generateBoardLatex({ fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' });
+// → '\\usepackage{skak}\n\\fenboard{rnbqkbnr/… w KQkq - 0 1}\n\\showboard'
+
+generateBoardLatex({
+  fen: 'r5k1/1b1p1ppp/p7/1p1Q4/2p1r3/PP4Pq/BBP2b1P/R4R1K w - - 0 20',
+  latexPackage: 'chessboard',
+  flipped: true,
+  showCoords: false,
+  mode: 'document',
+});
+```
+
+| Board state        | skak                             | chessboard     |
+| ------------------ | -------------------------------- | -------------- |
+| Flipped            | `\showinverseboard`              | `inverse=true` |
+| Coordinates hidden | `\notationoff` … `\notationon`   | `label=false`  |
+
+The FEN is normalized, validated, and checked against an allowlist
+(`/^[A-Za-z0-9/ -]+$/`) before it reaches the markup, so `\`, `{`, `}`, `%`
+and `$` can never be injected. Invalid input throws
+`LaTeX export failed: <reason>`. Also exported: `LATEX_PACKAGES`,
+`LATEX_PACKAGE_META`, `isLatexPackage`.
+
+---
+
 ### Inline piece SVGs
 
 ```ts

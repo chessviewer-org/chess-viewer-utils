@@ -78,6 +78,17 @@ export {
   type BoardSquareRef,
 } from './board-dom.js';
 
+export {
+  generateBoardLatex,
+  isLatexPackage,
+  LATEX_PACKAGES,
+  LATEX_PACKAGE_META,
+  type LatexPackage,
+  type LatexOutputMode,
+  type LatexPackageMeta,
+  type LatexExportConfig,
+} from './latex.js';
+
 export { PIECES, getPieceSVG } from './pieces.js';
 
 export {
