@@ -142,6 +142,28 @@ const svg = generateDiagram({
 
 ---
 
+### Hatched dark squares
+
+Problem books draw dark squares as diagonal lines instead of a solid fill.
+`squarePattern: 'hatched'` does the same: dark squares become the light colour
+crossed by lines in the dark colour, so the `print` theme (white and black)
+gives the classic book look and any other theme stays recognisable.
+
+```ts
+import { BOARD_THEMES, generateDiagram } from '@chessviewer-org/chess-viewer';
+
+const { light, dark } = BOARD_THEMES.print;
+generateDiagram({ fen, lightSquare: light, darkSquare: dark, squarePattern: 'hatched' });
+```
+
+The geometry is exported for other renderers: `hatchSegments(squareSize)`
+returns the line segments of one square in local coordinates,
+`hatchLineWidth(squareSize)` their stroke width, and `hatchPatternSVG()` an SVG
+`<pattern>` anchored at the board origin. Lines are aligned to square corners,
+so neighbouring squares join seamlessly.
+
+---
+
 ### Board annotations
 
 Draw square highlights, move/threat arrows, and a check/checkmate glow on top
@@ -530,10 +552,20 @@ generateBoardLatex({
 });
 ```
 
-| Board state        | skak                             | chessboard     |
-| ------------------ | -------------------------------- | -------------- |
-| Flipped            | `\showinverseboard`              | `inverse=true` |
-| Coordinates hidden | `\notationoff` … `\notationon`   | `label=false`  |
+| Board state        | skak                             | chessboard           |
+| ------------------ | -------------------------------- | -------------------- |
+| Flipped            | `\showinverseboard`              | `inverse=true`       |
+| Coordinates hidden | `\notationoff` … `\notationon`   | `label=false`        |
+| `boardSize: 'small'` | `\smallboard` … `\normalboard` | `boardfontsize=15pt` |
+| `showMover: false` | — (needs PostScript)             | `showmover=false`    |
+
+`boardSize` takes `'tiny' | 'small' | 'normal' | 'large'` (10/15/20/30 pt per
+square). Switches that skak applies globally are restored after the diagram, so
+a snippet never changes the diagrams that follow it.
+
+TeX needs more than a minimal install: skak loads `lambda.sty`
+(`collection-plaingeneric`) and chessboard loads `xifthen.sty`
+(`collection-latexextra`) besides `collection-games`.
 
 The FEN is normalized, validated, and checked against an allowlist
 (`/^[A-Za-z0-9/ -]+$/`) before it reaches the markup, so `\`, `{`, `}`, `%`

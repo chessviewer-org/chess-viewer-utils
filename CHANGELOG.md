@@ -18,8 +18,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [Unreleased]
 
+### Fixed
+
+- **`changeDPI` for JPEG** — the density was written two bytes too far into an
+  existing JFIF segment, so units stayed "aspect ratio" and the thumbnail size
+  was corrupted. JPEG exports now carry the requested DPI.
+
 ### Added
 
+- **Hatched dark squares** — `generateDiagram` takes `squarePattern: 'hatched'`
+  for the problem-book look; `hatchSegments`, `hatchLineWidth` and
+  `hatchPatternSVG` expose the same geometry to canvas and SVG renderers.
+- **`print` board theme** — white and black, placed after the wood tones;
+  `coral` was dropped as a near duplicate of `sunset`, keeping 20 themes.
+- **LaTeX `boardSize` and `showMover`** — tiny/small/normal/large diagrams for
+  both packages and a switch for chessboard's side-to-move marker.
 - **LaTeX export** — new module `latex.ts` exports `generateBoardLatex`,
   `isLatexPackage`, `LATEX_PACKAGES`, and `LATEX_PACKAGE_META`. Produces `skak`
   or `chessboard` markup (snippet or compilable document) with board flip and
