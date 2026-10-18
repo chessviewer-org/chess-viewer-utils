@@ -52,8 +52,8 @@ async function changeJpegDPI(blob: Blob, dpi: number): Promise<Blob> {
     const length = (l1 << 8) + l2;
     if (marker === 0xe0 && length >= 16) {
       const jfif = bytes.slice(pos, pos + 2 + length);
-      jfif[13] = 1; jfif[14] = (dpi >> 8) & 0xff; jfif[15] = dpi & 0xff;
-      jfif[16] = (dpi >> 8) & 0xff; jfif[17] = dpi & 0xff;
+      jfif[11] = 1; jfif[12] = (dpi >> 8) & 0xff; jfif[13] = dpi & 0xff;
+      jfif[14] = (dpi >> 8) & 0xff; jfif[15] = dpi & 0xff;
       const out = new Uint8Array(bytes.length);
       out.set(bytes.slice(0, pos)); out.set(jfif, pos);
       out.set(bytes.slice(pos + 2 + length), pos + 2 + length);
