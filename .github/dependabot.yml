@@ -14,6 +14,9 @@ updates:
     commit-message:
       prefix: "chore"
       include: scope
+    ignore:
+      - dependency-name: conventional-changelog-conventionalcommits
+        versions: [">=10.3.0"]
     groups:
       # Group all devDependency patches/minors into one PR
       dev-deps:
