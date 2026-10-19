@@ -533,8 +533,8 @@ const correctedJpeg = await changeDPI(originalBlob, 150, 'jpeg');
 
 ### LaTeX export
 
-Turn a position into ready-to-paste markup for the `skak` or `chessboard`
-LaTeX packages. Board orientation and coordinate visibility carry over, and
+Turn a position into ready-to-paste markup for the `skak`, `chessboard` or
+`diagram` (chess-problem-diagrams) LaTeX packages. Board orientation and coordinate visibility carry over, and
 `mode: 'document'` wraps the diagram in a file that compiles as-is.
 
 ```ts
@@ -563,6 +563,59 @@ generateBoardLatex({
 square). Switches that skak applies globally are restored after the diagram, so
 a snippet never changes the diagrams that follow it.
 
+#### Problem collections and books
+
+`generateLatexDocument` typesets many positions at once and adds the problem
+metadata composers expect. Pick `latexPackage: 'diagram'` for the
+`chess-problem-diagrams` package, which prints hatched boards with the author,
+source, award, stipulation and piece count under each board.
+
+```ts
+import { generateLatexDocument } from '@chessviewer-org/chess-viewer';
+
+generateLatexDocument({
+  latexPackage: 'diagram',
+  mode: 'document',
+  columns: 2,
+  solutions: true,
+  title: 'Two-movers',
+  positions: [
+    {
+      fen: '8/8/8/3k4/8/4K3/3Q4/8 w - - 0 1',
+      author: 'Loyd, Sam',
+      source: 'Chess Monthly, 1903',
+      award: '1st Prize',
+      stipulation: '#2',
+      solution: '1.Qd2-c3!'
+    }
+  ]
+});
+```
+
+| Option | Values | Notes |
+| ------ | ------ | ----- |
+| `mode` | `'snippet'`, `'document'`, `'standalone'` | `standalone` produces a cropped figure with `varwidth` |
+| `columns` | 1–4 | Boards per row, laid out with `minipage` |
+| `documentClass`, `paper`, `fontSize`, `marginMm` | `article`/`report`/`book`, `a4`/`a5`/`letter`, 10/11/12, 5–50 | Document mode only |
+| `title`, `documentAuthor` | text | Adds a title page |
+| `numbering`, `pieceCount`, `solutions` | boolean | Number boards, print `(white+black)`, list solutions at the end |
+| `showCoords`, `showMover`, `boardSize` | as above | Apply to every board |
+
+Each position accepts `fen`, `flipped`, `caption`, `author`, `source`, `award`,
+`stipulation`, `remark` and `solution`. With the `chessboard` package,
+`highlights` and `arrows` (the same shapes the SVG renderer takes) become
+`markfields`/`markmoves` keys with matching colours. The `diagram` package
+always prints White at the bottom and no coordinates, and writes authors as
+`Surname, First name` (a plain `First Last` is rewritten for you).
+
+A document holds at most `LATEX_MAX_POSITIONS` (100) positions; see the
+[LaTeX export guide](./docs/guides/latex-export.md) for every option.
+
+All free text is escaped, so `#2`, `50%` and `R&D` are safe to type as-is. When
+text contains the Azerbaijani schwa (`ə`, `Ə`) the preamble declares it for
+pdfLaTeX. Output targets pdfLaTeX; the `tlmgr` packages needed are `skak`,
+`chessboard` or `chess-problem-diagrams`, plus `geometry` or `standalone`.
+
 TeX needs more than a minimal install: skak loads `lambda.sty`
 (`collection-plaingeneric`) and chessboard loads `xifthen.sty`
 (`collection-latexextra`) besides `collection-games`.
@@ -571,7 +624,10 @@ The FEN is normalized, validated, and checked against an allowlist
 (`/^[A-Za-z0-9/ -]+$/`) before it reaches the markup, so `\`, `{`, `}`, `%`
 and `$` can never be injected. Invalid input throws
 `LaTeX export failed: <reason>`. Also exported: `LATEX_PACKAGES`,
-`LATEX_PACKAGE_META`, `isLatexPackage`.
+`LATEX_PACKAGE_META`, `LATEX_DOCUMENT_CLASSES`, `LATEX_PAPER_SIZES`,
+`LATEX_FONT_SIZES`, `LATEX_COLUMN_RANGE`, `LATEX_MARGIN_RANGE_MM`,
+`LATEX_MAX_POSITIONS`, `LATEX_DIAGRAM_SIZE_PT`, `escapeLatex`, `pieceCounts`,
+`isLatexPackage`, `isLatexBoardSize`.
 
 ---
 

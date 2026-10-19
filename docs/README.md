@@ -15,6 +15,8 @@ For the public API surface, see the [API reference](../README.md#api-reference).
   manipulate boards immutably.
 - [Export pipeline](./guides/export-pipeline.md) — go from SVG to a
   print-ready raster with correct DPI.
+- [LaTeX export](./guides/latex-export.md) — single diagrams and whole problem
+  collections for `skak`, `chessboard` and `chess-problem-diagrams`.
 
 ### Architecture
 

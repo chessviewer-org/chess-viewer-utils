@@ -28,6 +28,13 @@
 | `history.ts` | History entry types and pure list utilities. |
 | `image.ts` | Read PNG/JPEG dimensions; compute physical print sizes. |
 | `dpi.ts` | Rewrite PNG `pHYs` / JPEG JFIF DPI metadata. |
+| `annotations.ts` | Highlight, arrow and check-indicator types, validation and SVG overlays. |
+| `pattern.ts` | Hatched dark-square geometry, piece halo and board outline shared by every renderer. |
+| `interaction.ts` | Framework-free click, drag and palette-drop logic for board editors. |
+| `board-dom.ts` | `createBoard`, a dependency-free DOM board built on `interaction.ts`. |
+| `latex-core.ts` | LaTeX package metadata, FEN gate, text escaping and per-package board markup. |
+| `latex-document.ts` | Multi-position documents: preamble, layout, captions and solutions. |
+| `latex.ts` | Public LaTeX entry points (`generateBoardLatex`, `generateLatexDocument`). |
 | `validation.ts` | Input sanitization helpers. |
 | `index.ts` | Single public entry point — re-exports everything. |
 
@@ -38,7 +45,7 @@
 - **Entry:** `src/index.ts` is the only entry; everything is re-exported there.
 - **Package exports:** the `exports` map in `package.json` resolves `types`,
   `import`, and `require` conditions.
-- **Tests:** the Node.js native test runner executes `src/index.test.ts`.
+- **Tests:** the Node.js native test runner executes every `src/*.test.ts` file.
 - **Release:** `semantic-release` computes the version from Conventional
   Commits, updates the changelog, publishes to npm over OIDC, and cuts a GitHub
   Release.
