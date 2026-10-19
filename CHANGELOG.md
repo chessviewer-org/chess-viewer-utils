@@ -3,6 +3,8 @@
 All notable changes to `@chessviewer-org/chess-viewer` are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [1.5.0](https://github.com/chessviewer-org/chess-viewer-utils/compare/v1.4.0...v1.5.0) (2026-10-19)
+
 ## [1.4.0](https://github.com/chessviewer-org/chess-viewer-utils/compare/v1.3.0...v1.4.0) (2026-10-18)
 
 ## [1.3.0](https://github.com/chessviewer-org/chess-viewer-utils/compare/v1.2.0...v1.3.0) (2026-10-18)
