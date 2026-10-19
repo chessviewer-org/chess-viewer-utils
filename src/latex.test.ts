@@ -15,8 +15,8 @@ const TACTIC_FEN =
   'r5k1/1b1p1ppp/p7/1p1Q4/2p1r3/PP4Pq/BBP2b1P/R4R1K w - - 0 20';
 
 describe('package metadata', () => {
-  test('exposes exactly the two packages from the feature scope', () => {
-    assert.deepEqual([...LATEX_PACKAGES], ['skak', 'chessboard']);
+  test('exposes the three supported packages', () => {
+    assert.deepEqual([...LATEX_PACKAGES], ['skak', 'chessboard', 'diagram']);
   });
 
   test('each package carries its own \\usepackage line', () => {
@@ -219,10 +219,16 @@ describe('output modes', () => {
     }).split('\n');
 
     assert.deepEqual(lines, [
-      '\\documentclass{article}',
+      '\\documentclass[11pt,a4paper]{article}',
+      '\\usepackage[T1]{fontenc}',
+      '\\usepackage[utf8]{inputenc}',
+      '\\usepackage[margin=20mm]{geometry}',
       '\\usepackage{chessboard}',
+      '\\setlength{\\parindent}{0pt}',
       '\\begin{document}',
+      '\\begin{center}',
       `\\chessboard[setfen=${START_FEN}]`,
+      '\\end{center}',
       '\\end{document}'
     ]);
   });
@@ -236,11 +242,17 @@ describe('output modes', () => {
     }).split('\n');
 
     assert.deepEqual(lines, [
-      '\\documentclass{article}',
+      '\\documentclass[11pt,a4paper]{article}',
+      '\\usepackage[T1]{fontenc}',
+      '\\usepackage[utf8]{inputenc}',
+      '\\usepackage[margin=20mm]{geometry}',
       '\\usepackage{skak}',
+      '\\setlength{\\parindent}{0pt}',
       '\\begin{document}',
+      '\\begin{center}',
       `\\fenboard{${START_FEN}}`,
       '\\showinverseboard',
+      '\\end{center}',
       '\\end{document}'
     ]);
   });

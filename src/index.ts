@@ -97,17 +97,33 @@ export {
 
 export {
   generateBoardLatex,
+  generateLatexDocument,
+  escapeLatex,
+  pieceCounts,
   isLatexPackage,
   isLatexBoardSize,
   LATEX_PACKAGES,
   LATEX_PACKAGE_META,
   LATEX_BOARD_SIZES,
   LATEX_BOARD_SIZE_PT,
+  LATEX_DIAGRAM_SIZE_PT,
+  LATEX_DOCUMENT_CLASSES,
+  LATEX_PAPER_SIZES,
+  LATEX_FONT_SIZES,
+  LATEX_COLUMN_RANGE,
+  LATEX_MARGIN_RANGE_MM,
+  LATEX_MAX_POSITIONS,
   type LatexBoardSize,
   type LatexPackage,
   type LatexOutputMode,
   type LatexPackageMeta,
+  type LatexPosition,
   type LatexExportConfig,
+  type LatexLayoutOptions,
+  type LatexDocumentConfig,
+  type LatexDocumentClass,
+  type LatexPaperSize,
+  type LatexFontSize,
 } from './latex.js';
 
 export { PIECES, getPieceSVG } from './pieces.js';
