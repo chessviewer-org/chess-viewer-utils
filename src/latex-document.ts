@@ -301,15 +301,33 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
         ),
       ].map(colorDefinition)
     : [];
-  const diagramNumbering =
-    latexPackage === 'diagram' && !numbering ? ['\\nodiagnumbering'] : [];
+  const diagramSetup =
+    latexPackage === 'diagram'
+      ? ['\\nocomputer', ...(numbering ? [] : ['\\nodiagnumbering'])]
+      : [];
+  const title = cleanText(config.title, 'title');
+  const documentAuthor = cleanText(config.documentAuthor, 'author');
+  const texts = [
+    title,
+    documentAuthor,
+    ...items.flatMap((item) => [
+      item.caption,
+      item.author,
+      item.source,
+      item.award,
+      item.stipulation,
+      item.remark,
+      item.solution,
+    ]),
+  ];
   const setup = [
     packageLine(latexPackage, size),
     ...colors,
-    ...diagramNumbering,
+    ...diagramSetup,
   ];
 
   if (mode === 'snippet') {
+    setup.splice(1, 0, ...schwaLines(texts));
     return [...setup, ...body, ...solutionLines(items, config.solutions === true)].join('\n');
   }
 
@@ -327,27 +345,10 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
     20,
     'margin'
   );
-  const title = cleanText(config.title, 'title');
-  const documentAuthor = cleanText(config.documentAuthor, 'author');
-
   const classLine =
     mode === 'standalone'
       ? `\\documentclass[border=${STANDALONE_BORDER_PT}pt,varwidth=${STANDALONE_WIDTH_MM}mm]{standalone}`
       : `\\documentclass[${fontSize}pt,${PAPER_OPTION[paper]}]{${documentClass}}`;
-
-  const texts = [
-    title,
-    documentAuthor,
-    ...items.flatMap((item) => [
-      item.caption,
-      item.author,
-      item.source,
-      item.award,
-      item.stipulation,
-      item.remark,
-      item.solution,
-    ]),
-  ];
 
   const preamble = [
     classLine,
