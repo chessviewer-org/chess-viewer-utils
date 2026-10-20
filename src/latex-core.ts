@@ -24,6 +24,15 @@ export type LatexPackage = (typeof LATEX_PACKAGES)[number];
 export type LatexOutputMode = 'snippet' | 'document' | 'standalone';
 export type LatexBoardSize = (typeof LATEX_BOARD_SIZES)[number];
 
+export const LATEX_CAPTION_STYLES = [
+  'classic',
+  'problem',
+  'study',
+  'game',
+  'plain',
+] as const;
+export type LatexCaptionStyle = (typeof LATEX_CAPTION_STYLES)[number];
+
 export interface LatexPackageMeta {
   label: string;
   usePackage: string;
@@ -44,6 +53,11 @@ export interface LatexPosition {
   stipulation?: string;
   remark?: string;
   solution?: string;
+  white?: string;
+  black?: string;
+  event?: string;
+  date?: string;
+  captionStyle?: LatexCaptionStyle;
 }
 
 export const LATEX_PACKAGE_META: Record<LatexPackage, LatexPackageMeta> = {
@@ -101,6 +115,26 @@ export function isLatexPackage(value: unknown): value is LatexPackage {
     typeof value === 'string' &&
     (LATEX_PACKAGES as readonly string[]).includes(value)
   );
+}
+
+export function isLatexCaptionStyle(
+  value: unknown
+): value is LatexCaptionStyle {
+  return (
+    typeof value === 'string' &&
+    (LATEX_CAPTION_STYLES as readonly string[]).includes(value)
+  );
+}
+
+export function resolveCaptionStyle(
+  value: unknown,
+  fallback: LatexCaptionStyle
+): LatexCaptionStyle {
+  if (value === undefined) return fallback;
+  if (!isLatexCaptionStyle(value)) {
+    fail(`unsupported caption style "${String(value)}"`);
+  }
+  return value;
 }
 
 export function isLatexBoardSize(value: unknown): value is LatexBoardSize {

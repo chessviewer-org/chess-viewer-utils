@@ -600,9 +600,14 @@ generateLatexDocument({
 | `title`, `documentAuthor` | text | Adds a title page |
 | `numbering`, `pieceCount`, `solutions` | boolean | Number boards, print `(white+black)`, list solutions at the end |
 | `showCoords`, `showMover`, `boardSize` | as above | Apply to every board |
+| `captionStyle` | `'classic'`, `'problem'`, `'study'`, `'game'`, `'plain'` | Text layout around each board; also settable per position |
 
 Each position accepts `fen`, `flipped`, `caption`, `author`, `source`, `award`,
-`stipulation`, `remark` and `solution`. With the `chessboard` package,
+`stipulation`, `remark`, `solution`, the game fields `white`, `black`, `event`
+and `date`, and its own `captionStyle`. The `problem` style prints the number
+and credits above the board with `(white+black)` bottom-left and the
+stipulation bottom-right; `game` prints the players, event and date above and
+the side to move below. With the `chessboard` package,
 `highlights` and `arrows` (the same shapes the SVG renderer takes) become
 `markfields`/`markmoves` keys with matching colours. The `diagram` package
 always prints White at the bottom and no coordinates, and writes authors as
@@ -627,7 +632,8 @@ and `$` can never be injected. Invalid input throws
 `LATEX_PACKAGE_META`, `LATEX_DOCUMENT_CLASSES`, `LATEX_PAPER_SIZES`,
 `LATEX_FONT_SIZES`, `LATEX_COLUMN_RANGE`, `LATEX_MARGIN_RANGE_MM`,
 `LATEX_MAX_POSITIONS`, `LATEX_DIAGRAM_SIZE_PT`, `escapeLatex`, `pieceCounts`,
-`isLatexPackage`, `isLatexBoardSize`.
+`isLatexPackage`, `isLatexBoardSize`, `LATEX_CAPTION_STYLES`,
+`isLatexCaptionStyle`.
 
 ---
 
