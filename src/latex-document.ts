@@ -3,6 +3,7 @@ import {
   LATEX_DIAGRAM_SIZE_PT,
   LATEX_PACKAGE_META,
   type LatexBoardSize,
+  type LatexCaptionStyle,
   type LatexOutputMode,
   type LatexPackage,
   type LatexPosition,
@@ -14,6 +15,7 @@ import {
   pieceCounts,
   positionColors,
   resolveBoardSize,
+  resolveCaptionStyle,
   resolveFen,
   resolvePackage,
   skakLines,
@@ -47,6 +49,7 @@ export interface LatexLayoutOptions {
   numbering?: boolean;
   pieceCount?: boolean;
   solutions?: boolean;
+  captionStyle?: LatexCaptionStyle;
 }
 
 export interface LatexDocumentConfig extends LatexLayoutOptions {
@@ -64,7 +67,20 @@ interface PreparedPosition {
   stipulation: string;
   remark: string;
   solution: string;
+  white: string;
+  black: string;
+  event: string;
+  date: string;
+  captionStyle: LatexCaptionStyle;
 }
+
+interface CaptionOptions {
+  numbering: boolean;
+  pieceCount: boolean;
+}
+
+const BOARD_BOX = '\\cvboard';
+const BOARD_WIDTH = '\\cvboardwidth';
 
 const PAPER_OPTION: Record<LatexPaperSize, string> = {
   a4: 'a4paper',
@@ -111,7 +127,8 @@ function boundedInteger(
 
 function preparePosition(
   position: LatexPosition,
-  defaultFlipped: boolean
+  defaultFlipped: boolean,
+  defaultStyle: LatexCaptionStyle
 ): PreparedPosition {
   if (!position || typeof position !== 'object') fail('position is missing');
   return {
@@ -125,6 +142,11 @@ function preparePosition(
     stipulation: cleanText(position.stipulation, 'stipulation'),
     remark: cleanText(position.remark, 'remark'),
     solution: cleanText(position.solution, 'solution'),
+    white: cleanText(position.white, 'white player'),
+    black: cleanText(position.black, 'black player'),
+    event: cleanText(position.event, 'event'),
+    date: cleanText(position.date, 'date'),
+    captionStyle: resolveCaptionStyle(position.captionStyle, defaultStyle),
   };
 }
 
@@ -132,7 +154,7 @@ function numberLabel(index: number): string {
   return `\\textbf{No.~${index + 1}}`;
 }
 
-function captionLines(
+function classicLines(
   item: PreparedPosition,
   index: number,
   numbering: boolean,
@@ -152,15 +174,210 @@ function captionLines(
     .filter(Boolean)
     .join('\\quad ');
 
-  const lines: string[] = [];
-  if (headline) lines.push(`${headline}\\\\`);
-  if (credits) lines.push(`{\\small ${credits}}\\\\`);
-  if (item.remark) lines.push(`{\\small\\itshape ${item.remark}}\\\\`);
-  if (footer) lines.push(`${footer}\\\\`);
-  if (!lines.length) return lines;
+  return [
+    headline,
+    credits ? `{\\small ${credits}}` : '',
+    item.remark ? `{\\small\\itshape ${item.remark}}` : '',
+    footer,
+  ].filter(Boolean);
+}
 
-  lines[lines.length - 1] = lines[lines.length - 1]!.replace(/\\\\$/, '');
-  return ['\\par\\smallskip', ...lines];
+function joined(parts: string[], separator: string): string {
+  return parts.filter(Boolean).join(separator);
+}
+
+function stacked(lines: string[]): string {
+  return lines.filter(Boolean).join('\\\\ ');
+}
+
+function countLabel(fen: string): string {
+  const { white, black } = pieceCounts(fen);
+  return `(${white}+${black})`;
+}
+
+function sideToMove(fen: string): string {
+  return fen.split(' ')[1] === 'b' ? 'Black to move' : 'White to move';
+}
+
+function headline(item: PreparedPosition, index: number, numbering: boolean) {
+  return joined(
+    [numbering ? numberLabel(index) : '', item.caption],
+    '\\quad '
+  );
+}
+
+interface CaptionParts {
+  above: string[];
+  left: string;
+  right: string;
+  center: string;
+}
+
+function captionParts(
+  item: PreparedPosition,
+  index: number,
+  options: CaptionOptions
+): CaptionParts {
+  const number = options.numbering ? numberLabel(index) : '';
+  const count = options.pieceCount ? countLabel(item.fen) : '';
+  const stipulation = item.stipulation ? `\\textbf{${item.stipulation}}` : '';
+  const credits = [
+    item.author ? `\\textbf{${item.author}}` : '',
+    item.source ? `{\\small\\itshape ${item.source}}` : '',
+    item.award ? `{\\small ${item.award}}` : '',
+    item.remark ? `{\\small\\itshape ${item.remark}}` : '',
+  ];
+  const blank = { above: [], left: '', right: '', center: '' };
+
+  switch (item.captionStyle) {
+    case 'problem':
+      return {
+        ...blank,
+        above: [headline(item, index, options.numbering), ...credits],
+        left: count,
+        right: stipulation,
+      };
+    case 'study':
+      return {
+        ...blank,
+        above: [headline(item, index, options.numbering), ...credits],
+        center: joined([stipulation, count], '\\quad '),
+      };
+    case 'game':
+      return {
+        ...blank,
+        above: [
+          number,
+          item.white || item.black
+            ? `\\textbf{${joined([item.white, item.black], ' -- ')}}`
+            : '',
+          joined([item.event, item.date], ', ')
+            ? `{\\small\\itshape ${joined([item.event, item.date], ', ')}}`
+            : '',
+          item.remark ? `{\\small\\itshape ${item.remark}}` : '',
+        ],
+        left: item.caption ? `{\\small ${item.caption}}` : '',
+        right: `{\\small ${sideToMove(item.fen)}}`,
+      };
+    default:
+      return {
+        ...blank,
+        above: [number],
+        center: joined([stipulation, count], '\\quad '),
+      };
+  }
+}
+
+
+interface FramedCell {
+  above: string;
+  board: string[];
+  below: string;
+}
+
+function framedCell(
+  item: PreparedPosition,
+  index: number,
+  board: string[],
+  options: CaptionOptions
+): FramedCell {
+  if (item.captionStyle === 'classic') {
+    return {
+      above: '',
+      board,
+      below: classicLines(
+        item,
+        index,
+        options.numbering,
+        options.pieceCount
+      ).join('\\par '),
+    };
+  }
+  const parts = captionParts(item, index, options);
+  return {
+    above: parts.above.filter(Boolean).join('\\par '),
+    board,
+    below:
+      parts.left || parts.right
+        ? `\\makebox[${BOARD_WIDTH}]{${parts.left}\\hfill ${parts.right}}`
+        : parts.center,
+  };
+}
+
+function framedLayout(cells: FramedCell[], columns: number): string[] {
+  const [first] = cells;
+  if (!first) return [];
+  const width = columns === 1 ? '\\linewidth' : columnWidth(columns);
+  const spec = `@{\\extracolsep{\\fill}}*{${columns}}{>{\\centering\\arraybackslash}b{${width}}@{}}`;
+  const lines = [
+    `\\begin{lrbox}{${BOARD_BOX}}`,
+    ...first.board,
+    '\\end{lrbox}',
+    `\\setlength{${BOARD_WIDTH}}{\\wd${BOARD_BOX}}`,
+  ];
+
+  for (let start = 0; start < cells.length; start += columns) {
+    const row = cells.slice(start, start + columns);
+    const padding = Array<string>(columns - row.length).fill('');
+    const above = [...row.map((cell) => cell.above), ...padding];
+    const below = [...row.map((cell) => cell.below), ...padding];
+
+    lines.push('\\noindent', `\\begin{tabular*}{\\linewidth}{${spec}}`);
+    if (above.some(Boolean)) lines.push(`${above.join(' & ')} \\\\[2pt]`);
+    for (let column = 0; column < columns; column++) {
+      lines.push(...(row[column]?.board ?? []));
+      lines.push(column < columns - 1 ? '&' : '\\\\[2pt]');
+    }
+    if (below.some(Boolean)) lines.push(`${below.join(' & ')} \\\\`);
+    lines.push('\\end{tabular*}', '\\par\\bigskip');
+  }
+  return lines;
+}
+
+function diagramFields(item: PreparedPosition) {
+  switch (item.captionStyle) {
+    case 'game':
+      return {
+        author: '',
+        source: joined(
+          [joined([item.white, item.black], ' -- '), item.event, item.date],
+          ', '
+        ),
+        award: '',
+        stipulation: '',
+        remark: joined([item.caption, item.remark], ' --- '),
+      };
+    case 'plain':
+      return {
+        author: '',
+        source: '',
+        award: '',
+        stipulation: item.stipulation,
+        remark: '',
+      };
+    default:
+      return {
+        author: item.author,
+        source: item.source,
+        award: item.award,
+        stipulation: item.stipulation,
+        remark: item.remark,
+      };
+  }
+}
+
+function captionLines(
+  item: PreparedPosition,
+  index: number,
+  numbering: boolean,
+  pieceCount: boolean
+): string[] {
+  const lines = classicLines(item, index, numbering, pieceCount);
+  if (!lines.length) return lines;
+  return [
+    '\\par\\smallskip',
+    ...lines.map((line, i) => (i < lines.length - 1 ? `${line}\\\\` : line)),
+  ];
 }
 
 function cellLines(
@@ -172,13 +389,7 @@ function cellLines(
   const boardOptions: BoardLineOptions = { ...options, flipped: item.flipped };
 
   if (latexPackage === 'diagram') {
-    return diagramLines(item.fen, {
-      author: item.author,
-      source: item.source,
-      award: item.award,
-      stipulation: item.stipulation,
-      remark: item.remark,
-    });
+    return diagramLines(item.fen, diagramFields(item));
   }
 
   const board =
@@ -274,25 +485,52 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
     1,
     'columns'
   );
+  const defaultStyle = resolveCaptionStyle(config.captionStyle, 'classic');
   const items = config.positions.map((position) =>
-    preparePosition(position, config.flipped ?? false)
+    preparePosition(position, config.flipped ?? false, defaultStyle)
   );
   const numbering = config.numbering ?? items.length > 1;
   const pieceCount = config.pieceCount ?? false;
 
-  const cells = items.map((item, index) =>
-    cellLines(latexPackage, item, index, {
-      flipped: item.flipped,
-      showCoords: config.showCoords !== false,
-      showMover: config.showMover !== false,
-      size,
-      numbering,
-      pieceCount,
-    })
-  );
+  const boardOptions = {
+    showCoords: config.showCoords !== false,
+    showMover: config.showMover !== false,
+    size,
+  };
+  const framed =
+    latexPackage !== 'diagram' &&
+    items.some((item) => item.captionStyle !== 'classic');
 
-  const bare = items.length === 1 && columns === 1 && mode === 'snippet';
-  const body = bare ? cells[0]! : layoutCells(cells, columns);
+  let body: string[];
+  if (framed) {
+    body = framedLayout(
+      items.map((item, index) =>
+        framedCell(
+          item,
+          index,
+          latexPackage === 'skak'
+            ? skakLines(item.fen, { ...boardOptions, flipped: item.flipped })
+            : chessboardLines(item.fen, item.position, {
+                ...boardOptions,
+                flipped: item.flipped,
+              }),
+          { numbering, pieceCount }
+        )
+      ),
+      columns
+    );
+  } else {
+    const cells = items.map((item, index) =>
+      cellLines(latexPackage, item, index, {
+        ...boardOptions,
+        flipped: item.flipped,
+        numbering,
+        pieceCount,
+      })
+    );
+    const bare = items.length === 1 && columns === 1 && mode === 'snippet';
+    body = bare ? cells[0]! : layoutCells(cells, columns);
+  }
 
   const colors = LATEX_PACKAGE_META[latexPackage].supportsMarks
     ? [
@@ -318,12 +556,23 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
       item.stipulation,
       item.remark,
       item.solution,
+      item.white,
+      item.black,
+      item.event,
+      item.date,
     ]),
   ];
   const setup = [
     packageLine(latexPackage, size),
     ...colors,
     ...diagramSetup,
+    ...(framed
+      ? [
+          '\\usepackage{array}',
+          `\\newsavebox{${BOARD_BOX}}`,
+          `\\newlength{${BOARD_WIDTH}}`,
+        ]
+      : []),
   ];
 
   if (mode === 'snippet') {

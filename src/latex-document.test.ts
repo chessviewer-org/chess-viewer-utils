@@ -403,3 +403,102 @@ describe('position limit', () => {
     );
   });
 });
+
+describe('caption styles', () => {
+  const problem = {
+    fen: ENDGAME_FEN,
+    author: 'Loyd, Sam',
+    source: 'Chess Monthly',
+    award: '1st Prize',
+    stipulation: '#2'
+  };
+  const game = {
+    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 4',
+    white: 'Kasparov',
+    black: 'Topalov',
+    event: 'Wijk aan Zee',
+    date: '1999',
+    caption: 'after 4.Nf3'
+  };
+
+  test('keeps the classic captions unless a style is chosen', () => {
+    const latex = generateLatexDocument({ positions: [problem, problem] });
+    assert.doesNotMatch(latex, /tabular\*|cvboard/);
+  });
+
+  test('puts the count bottom-left and the stipulation bottom-right in problem style', () => {
+    const latex = generateLatexDocument({
+      captionStyle: 'problem',
+      pieceCount: true,
+      positions: [problem]
+    });
+    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\(2\+1\)\\hfill \\textbf\{\\#2\}\}/);
+    assert.match(latex, /\\textbf\{Loyd, Sam\}\\par \{\\small\\itshape Chess Monthly\}/);
+    assert.match(latex, /\\usepackage\{array\}/);
+    assert.match(latex, /\\newsavebox\{\\cvboard\}/);
+  });
+
+  test('prints players, event and the side to move in game style', () => {
+    const latex = generateLatexDocument({
+      captionStyle: 'game',
+      positions: [game]
+    });
+    assert.match(latex, /\\textbf\{Kasparov -- Topalov\}/);
+    assert.match(latex, /\{\\small\\itshape Wijk aan Zee, 1999\}/);
+    assert.match(latex, /after 4\.Nf3\}\\hfill \{\\small Black to move\}/);
+  });
+
+  test('centres stipulation and count in study style', () => {
+    const latex = generateLatexDocument({
+      captionStyle: 'study',
+      pieceCount: true,
+      positions: [{ ...problem, stipulation: 'Win' }]
+    });
+    assert.match(latex, /\\textbf\{Win\}\\quad \(2\+1\)/);
+    assert.doesNotMatch(latex, /\\hfill/);
+  });
+
+  test('lets a position override the document style', () => {
+    const latex = generateLatexDocument({
+      captionStyle: 'problem',
+      columns: 2,
+      positions: [problem, { ...game, captionStyle: 'game' }]
+    });
+    assert.match(latex, /Kasparov -- Topalov/);
+    assert.match(latex, /\\textbf\{Loyd, Sam\}/);
+  });
+
+  test('aligns every board of a row in one table row', () => {
+    const latex = lines(
+      generateLatexDocument({
+        captionStyle: 'plain',
+        columns: 3,
+        positions: [problem, problem, problem, problem]
+      })
+    );
+    assert.equal(latex.filter((line) => line.startsWith('\\begin{tabular*}')).length, 2);
+    assert.equal(latex.filter((line) => line === '&').length, 4);
+  });
+
+  test('maps game details onto the diagram package fields', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'diagram',
+      captionStyle: 'game',
+      positions: [game]
+    });
+    assert.match(latex, /\\source\{Kasparov -- Topalov, Wijk aan Zee, 1999\}/);
+    assert.doesNotMatch(latex, /\\author/);
+    assert.doesNotMatch(latex, /tabular\*/);
+  });
+
+  test('rejects unknown styles', () => {
+    assert.throws(
+      () =>
+        generateLatexDocument({
+          captionStyle: 'fancy' as never,
+          positions: [problem]
+        }),
+      /caption style/
+    );
+  });
+});

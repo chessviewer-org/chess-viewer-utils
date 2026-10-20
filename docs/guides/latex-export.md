@@ -87,6 +87,7 @@ const tex = generateLatexDocument({
 | `pieceCount`              | `(white+black)` beside the stipulation | off       |
 | `solutions`               | Solutions section at the end           | off       |
 | `showCoords`, `showMover` | boolean                                | `true`    |
+| `captionStyle`            | see [Caption styles](#caption-styles)  | `classic` |
 
 A document holds at most `LATEX_MAX_POSITIONS` (100) positions. Invalid
 options throw instead of being silently replaced.
@@ -94,7 +95,8 @@ options throw instead of being silently replaced.
 ### Position fields
 
 `fen` is required. `flipped`, `caption`, `author`, `source`, `award`,
-`stipulation`, `remark` and `solution` are optional; empty fields are left out
+`stipulation`, `remark`, `solution`, `white`, `black`, `event`, `date` and
+`captionStyle` are optional; empty fields are left out
 of the markup. `highlights` and `arrows` use the same shapes as the SVG
 renderer and are emitted only for `chessboard`, grouped by style and colour
 with one `\definecolor` per colour.
@@ -103,6 +105,28 @@ With `diagram`, authors are written `Surname, First name` and separated by
 `;`. A plain `First Last` is rewritten for you. Only the FEN placement field
 is passed to `\fen`, because the package would read castling letters as
 pieces, and the piece count it checks is computed from the same field.
+
+### Caption styles
+
+`captionStyle` sets how the text around each board is arranged. Set it on the
+document and override it per position, so a book can mix games and problems.
+
+| Style     | Above the board                          | Below the board                              |
+| --------- | ---------------------------------------- | -------------------------------------------- |
+| `classic` | —                                        | number, caption, credits, remark, stipulation |
+| `problem` | number, caption, author, source, award   | `(white+black)` left, stipulation right      |
+| `study`   | number, caption, author, source, award   | stipulation and `(white+black)` centred      |
+| `game`    | number, `White -- Black`, event and date | caption left, side to move right             |
+| `plain`   | number                                   | stipulation                                  |
+
+Game positions take `white`, `black`, `event` and `date`. Every style except
+`classic` sets each row of boards as one `tabular*` row, so the boards line up
+even when their headings have different lengths, and the footer spans the
+board width. This needs the `array` package, which every TeX installation has.
+
+The `diagram` package keeps its own layout: `game` writes the players, event
+and date into `\source` and the caption into `\remark`; `plain` keeps only the
+stipulation.
 
 ## Safety
 
@@ -124,5 +148,15 @@ tlmgr install chess-problem-diagrams geometry
 pdflatex collection.tex
 ```
 
-`skak` also needs `lambda.sty` (`collection-plaingeneric`) and `chessboard`
-needs `xifthen.sty` (`collection-latexextra`).
+On a minimal TeX Live (TinyTeX, BasicTeX) these are the full lists:
+
+| Package      | `tlmgr install`                                          |
+| ------------ | -------------------------------------------------------- |
+| `skak`       | `skak chessfss lambda-lists skaknew`                     |
+| `chessboard` | `chessboard chessfss pgf skaknew xifthen`                |
+| `diagram`    | `chess-problem-diagrams bartel-chess-fonts pgf xstring`  |
+
+Add `geometry` for document mode and `standalone varwidth` for figure mode.
+
+With `diagram`, the package's not-computer-tested marker (`C-`) is switched off
+with `\nocomputer`.
