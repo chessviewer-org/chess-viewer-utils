@@ -213,6 +213,20 @@ describe('document and standalone modes', () => {
     assert.match(azeri, /DeclareUnicodeCharacter\{018F\}/);
     assert.match(azeri, /\\usepackage\{graphicx\}/);
   });
+
+  test('declares the schwa in snippets, before the package setup ends', () => {
+    const snippet = lines(
+      generateLatexDocument({
+        positions: [{ fen: START_FEN, author: 'Rəşad Əliyev' }],
+        mode: 'snippet'
+      })
+    );
+    const declared = snippet.findIndex((line) =>
+      line.startsWith('\\DeclareUnicodeCharacter{0259}')
+    );
+    assert.ok(declared > 0);
+    assert.ok(declared < snippet.indexOf('\\fenboard{' + START_FEN + '}'));
+  });
 });
 
 describe('chessboard marks', () => {
@@ -298,6 +312,7 @@ describe('diagram package', () => {
     });
     assert.deepEqual(lines(latex), [
       '\\usepackage[11pt]{diagram}',
+      '\\nocomputer',
       '\\nodiagnumbering',
       '\\begin{diagram}',
       '\\author{Loyd, Sam}',
@@ -334,6 +349,16 @@ describe('diagram package', () => {
       });
       assert.match(latex, new RegExp(`\\\\usepackage\\[${pt}pt\\]\\{diagram\\}`));
     }
+  });
+
+  test('hides the computer-tested marker the package prints by default', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'diagram',
+      mode: 'document',
+      positions: [{ fen: START_FEN }, { fen: ENDGAME_FEN }]
+    });
+    assert.match(latex, /\\nocomputer/);
+    assert.ok(latex.indexOf('\\nocomputer') < latex.indexOf('\\begin{document}'));
   });
 
   test('keeps numbering when several diagrams are exported', () => {
