@@ -243,7 +243,7 @@ describe('chessboard marks', () => {
     const latex = generateBoardLatex({ ...marked, latexPackage: 'chessboard' });
     assert.match(latex, /\\definecolor\{cvFFEB3B\}\{HTML\}\{FFEB3B\}/);
     assert.match(latex, /\\definecolor\{cvE8412C\}\{HTML\}\{E8412C\}/);
-    assert.match(latex, /pgfstyle=color,\n {2}color=cvFFEB3B!55,\n {2}markfields=\{e4\}/);
+    assert.match(latex, /pgfstyle=color,\n {2}color=cvFFEB3B!55,\n {2}backfields=\{e4\}/);
     assert.match(latex, /pgfstyle=circle,\n {2}color=cvE8412C,\n {2}markfields=\{d5\}/);
     assert.match(latex, /pgfstyle=straightmove,\n {2}color=cv15781B,\n {2}markmoves=\{e2-e4\}/);
   });
@@ -254,8 +254,15 @@ describe('chessboard marks', () => {
       latexPackage: 'chessboard',
       highlights: [{ square: 'a1' }, { square: 'b2' }]
     });
-    assert.match(latex, /markfields=\{a1,b2\}/);
-    assert.equal(latex.match(/markfields/g)?.length, 1);
+    assert.match(latex, /backfields=\{a1,b2\}/);
+    assert.equal(latex.match(/backfields/g)?.length, 1);
+  });
+
+  test('draws filled squares behind the pieces and rings above them', () => {
+    const latex = generateBoardLatex({ ...marked, latexPackage: 'chessboard' });
+    assert.doesNotMatch(latex, /markfields=\{e4\}/);
+    assert.match(latex, /backfields=\{e4\}/);
+    assert.match(latex, /markfields=\{d5\}/);
   });
 
   test('rejects colours that are not six-digit hex', () => {

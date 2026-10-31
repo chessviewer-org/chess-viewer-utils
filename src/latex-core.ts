@@ -222,7 +222,7 @@ interface MarkGroup {
   style: string;
   color: string;
   tint: boolean;
-  key: 'markfields' | 'markmoves';
+  key: 'backfields' | 'markfields' | 'markmoves';
   items: string[];
 }
 
@@ -248,7 +248,7 @@ function collectMarkGroups(position: LatexPosition): MarkGroup[] {
     }
     const ring = highlight.style === 'ring';
     add(
-      'markfields',
+      ring ? 'markfields' : 'backfields',
       ring ? 'circle' : 'color',
       highlight.color ?? DEFAULT_HIGHLIGHT_COLOR,
       !ring,

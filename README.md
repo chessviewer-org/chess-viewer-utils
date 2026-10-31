@@ -609,7 +609,8 @@ and credits above the board with `(white+black)` bottom-left and the
 stipulation bottom-right; `game` prints the players, event and date above and
 the side to move below. With the `chessboard` package,
 `highlights` and `arrows` (the same shapes the SVG renderer takes) become
-`markfields`/`markmoves` keys with matching colours. The `diagram` package
+`backfields`/`markfields`/`markmoves` keys with matching colours; filled
+squares are drawn behind the pieces so a highlighted piece stays visible. The `diagram` package
 always prints White at the bottom and no coordinates, and writes authors as
 `Surname, First name` (a plain `First Last` is rewritten for you).
 
