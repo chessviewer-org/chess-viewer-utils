@@ -35,6 +35,22 @@ export function hatchSegments(squareSize: number): HatchSegment[] {
   return segments;
 }
 
+export function hatchBoardPath(
+  originX: number,
+  originY: number,
+  squareSize: number
+): string {
+  const step = squareSize / HATCH_DIVISIONS;
+  const parts: string[] = [];
+  for (let k = 0; k <= HATCH_DIVISIONS * 16; k++) {
+    const c = k * step;
+    parts.push(
+      `M${originX + c + step},${originY - step}L${originX - step},${originY + c + step}`
+    );
+  }
+  return parts.join('');
+}
+
 export function hatchPatternSVG(
   id: string,
   squareSize: number,

@@ -5,6 +5,7 @@ import { BOARD_THEMES, STARTING_FEN } from './constants.ts';
 import {
   HATCH_DIVISIONS,
   boardOutlineWidth,
+  hatchBoardPath,
   hatchLineWidth,
   pieceHaloRadius,
   hatchPatternSVG,
@@ -55,9 +56,30 @@ test('generateDiagram draws hatched dark squares on the light colour', () => {
     darkSquare: '#000000',
     squarePattern: 'hatched',
   });
-  assert.equal((svg.match(/fill="url\(#cv-hatch\)"/g) ?? []).length, 32);
-  assert.equal((svg.match(/width="50" height="50" fill="#000000"/g) ?? []).length, 0);
-  assert.match(svg, /<defs><pattern id="cv-hatch"/);
+  const clip = /<clipPath id="cv-hatch">(.*?)<\/clipPath>/.exec(svg)?.[1] ?? '';
+  assert.equal((clip.match(/<rect /g) ?? []).length, 32);
+  assert.equal((svg.match(/clip-path="url\(#cv-hatch\)"/g) ?? []).length, 1);
+  assert.equal((svg.match(/width="50" height="50" fill=/g) ?? []).length, 0);
+  assert.ok(!svg.includes('<pattern'));
+});
+
+test('generateDiagram lays every square on one continuous base', () => {
+  const svg = generateDiagram({ fen: STARTING_FEN, size: 400, lightSquare: '#eeeeee', darkSquare: '#333333' });
+  const o = boardOutlineWidth(400);
+  assert.ok(svg.includes(`<rect x="${o}" y="${o}" width="400" height="400" fill="#eeeeee"/>`));
+  assert.equal((svg.match(/width="50" height="50" fill="#eeeeee"/g) ?? []).length, 0);
+  assert.equal((svg.match(/width="50" height="50" fill="#333333"/g) ?? []).length, 32);
+});
+
+test('hatchBoardPath continues the square hatching across the whole board', () => {
+  const d = hatchBoardPath(10, 20, 80);
+  const segments = d.split('M').filter(Boolean);
+  assert.equal(segments.length, HATCH_DIVISIONS * 16 + 1);
+  assert.equal(segments[0], '18,12L2,28');
+  for (const segment of segments) {
+    const [x1, y1, x2, y2] = segment.split(/[,L]/).map(Number);
+    assert.ok(Math.abs(x1! - 10 + (y1! - 20) - (x2! - 10 + (y2! - 20))) < 1e-9);
+  }
 });
 
 test('generateDiagram haloes only the pieces standing on hatched squares', () => {
@@ -73,7 +95,7 @@ test('generateDiagram frames the board on all four sides inside the canvas', () 
   const svg = generateDiagram({ fen: STARTING_FEN, size });
   assert.ok(svg.includes(`viewBox="0 0 ${size + o * 2} ${size + o * 2}"`));
   assert.ok(svg.includes(`<rect x="0" y="0" width="${size + o * 2}" height="${size + o * 2}" fill="#000000"/>`));
-  assert.ok(svg.includes(`<rect x="${o}" y="${o}" width="60" height="60"`));
+  assert.ok(svg.includes(`<rect x="${o}" y="${o}" width="${size}" height="${size}"`));
 });
 
 test('outline and halo follow the measured book proportions', () => {

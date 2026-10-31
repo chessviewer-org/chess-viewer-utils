@@ -156,11 +156,13 @@ const { light, dark } = BOARD_THEMES.print;
 generateDiagram({ fen, lightSquare: light, darkSquare: dark, squarePattern: 'hatched' });
 ```
 
-The geometry is exported for other renderers: `hatchSegments(squareSize)`
-returns the line segments of one square in local coordinates,
-`hatchLineWidth(squareSize)` their stroke width, and `hatchPatternSVG()` an SVG
-`<pattern>` anchored at the board origin. Lines are aligned to square corners,
-so neighbouring squares join seamlessly.
+The board is laid on one light base and the hatching is drawn as a single
+path clipped to the dark squares, so no tile edges or seams show at any zoom
+or display scale. The geometry is exported for other renderers:
+`hatchSegments(squareSize)` returns the line segments of one square in local
+coordinates, `hatchBoardPath(originX, originY, squareSize)` the path data for
+the whole board, `hatchLineWidth(squareSize)` their stroke width, and
+`hatchPatternSVG()` an SVG `<pattern>` anchored at the board origin.
 
 ---
 

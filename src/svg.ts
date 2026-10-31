@@ -11,7 +11,8 @@ import {
 import { isValidHexColor } from './validation.js';
 import {
   boardOutlineWidth,
-  hatchPatternSVG,
+  hatchBoardPath,
+  hatchLineWidth,
   pieceHaloFilterSVG,
   pieceHaloRadius,
   type SquarePattern,
@@ -90,8 +91,7 @@ export function generateDiagram(options: DiagramOptions): string {
   parts.push(`<title>${escapeXml(label)}</title>`);
   if (hatched) {
     parts.push(
-      `<defs>${hatchPatternSVG('cv-hatch', squareSize, boardX, boardY, escapeXml(darkSquare))}` +
-      `${pieceHaloFilterSVG('cv-halo', pieceHaloRadius(PIECE_VIEWBOX), escapeXml(lightSquare))}</defs>`
+      `<defs>${pieceHaloFilterSVG('cv-halo', pieceHaloRadius(PIECE_VIEWBOX), escapeXml(lightSquare))}</defs>`
     );
   }
 
@@ -110,18 +110,27 @@ export function generateDiagram(options: DiagramOptions): string {
     `width="${size + outline * 2}" height="${size + outline * 2}" fill="#000000"/>`
   );
 
+  parts.push(
+    `<rect x="${boardX}" y="${boardY}" width="${size}" height="${size}" fill="${escapeXml(lightSquare)}"/>`
+  );
+
+  const darkSquares: string[] = [];
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-      const visRow = flipped ? 7 - row : row;
-      const visCol = flipped ? 7 - col : col;
-      const isLight = (row + col) % 2 === 0;
-      const color = isLight || hatched ? lightSquare : darkSquare;
-      const x = boardX + visCol * squareSize;
-      const y = boardY + visRow * squareSize;
-      const rect = `<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" `;
-      parts.push(`${rect}fill="${escapeXml(color)}"/>`);
-      if (hatched && !isLight) parts.push(`${rect}fill="url(#cv-hatch)"/>`);
+      if ((row + col) % 2 === 0) continue;
+      const x = boardX + (flipped ? 7 - col : col) * squareSize;
+      const y = boardY + (flipped ? 7 - row : row) * squareSize;
+      darkSquares.push(`<rect x="${x}" y="${y}" width="${squareSize}" height="${squareSize}"`);
     }
+  }
+  if (hatched) {
+    parts.push(
+      `<clipPath id="cv-hatch">${darkSquares.map((rect) => `${rect}/>`).join('')}</clipPath>`,
+      `<path clip-path="url(#cv-hatch)" d="${hatchBoardPath(boardX, boardY, squareSize)}" ` +
+      `stroke="${escapeXml(darkSquare)}" stroke-width="${hatchLineWidth(squareSize)}" fill="none"/>`
+    );
+  } else {
+    parts.push(...darkSquares.map((rect) => `${rect} fill="${escapeXml(darkSquare)}"/>`));
   }
 
   const annotations = options.annotations ? sanitizeAnnotations(options.annotations) : null;

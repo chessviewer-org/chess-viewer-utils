@@ -47,6 +47,7 @@ export {
   isSquarePattern,
   hatchLineWidth,
   hatchSegments,
+  hatchBoardPath,
   hatchPatternSVG,
   boardOutlineWidth,
   pieceHaloRadius,
