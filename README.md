@@ -162,7 +162,10 @@ or display scale. The geometry is exported for other renderers:
 `hatchSegments(squareSize)` returns the line segments of one square in local
 coordinates, `hatchBoardPath(originX, originY, squareSize)` the path data for
 the whole board, `hatchLineWidth(squareSize)` their stroke width, and
-`hatchPatternSVG()` an SVG `<pattern>` anchored at the board origin.
+`hatchPatternSVG()` an SVG `<pattern>` anchored at the board origin. Pieces on
+hatched squares get a light halo drawn as a wider outline beneath the piece,
+which `pieceHaloStyleSVG()` provides as a stylesheet, so it stays sharp at any
+size instead of being rasterised by a filter.
 
 ---
 

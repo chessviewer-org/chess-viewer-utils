@@ -8,6 +8,7 @@ import {
   hatchBoardPath,
   hatchLineWidth,
   pieceHaloRadius,
+  pieceHaloStyleSVG,
   hatchPatternSVG,
   hatchSegments,
   isSquarePattern,
@@ -84,8 +85,9 @@ test('hatchBoardPath continues the square hatching across the whole board', () =
 
 test('generateDiagram haloes only the pieces standing on hatched squares', () => {
   const svg = generateDiagram({ fen: STARTING_FEN, squarePattern: 'hatched' });
-  assert.match(svg, /<filter id="cv-halo"/);
-  assert.equal((svg.match(/filter="url\(#cv-halo\)"/g) ?? []).length, 16);
+  assert.ok(!svg.includes('<filter'));
+  assert.match(svg, /<style>\.cv-halo,\.cv-halo \*\{stroke:#f0d9b5;stroke-width:4\.65px;/);
+  assert.equal((svg.match(/<g class="cv-halo">/g) ?? []).length, 16);
   assert.ok(!generateDiagram({ fen: STARTING_FEN }).includes('cv-halo'));
 });
 
@@ -96,6 +98,13 @@ test('generateDiagram frames the board on all four sides inside the canvas', () 
   assert.ok(svg.includes(`viewBox="0 0 ${size + o * 2} ${size + o * 2}"`));
   assert.ok(svg.includes(`<rect x="0" y="0" width="${size + o * 2}" height="${size + o * 2}" fill="#000000"/>`));
   assert.ok(svg.includes(`<rect x="${o}" y="${o}" width="${size}" height="${size}"`));
+});
+
+test('pieceHaloStyleSVG widens the piece outline by the halo radius on each side', () => {
+  assert.equal(
+    pieceHaloStyleSVG('h', 2, 1.5, '#fff'),
+    '<style>.h,.h *{stroke:#fff;stroke-width:5.5px;stroke-linejoin:round;stroke-linecap:round}</style>'
+  );
 });
 
 test('outline and halo follow the measured book proportions', () => {

@@ -68,6 +68,18 @@ export function hatchPatternSVG(
   );
 }
 
+export function pieceHaloStyleSVG(
+  className: string,
+  radius: number,
+  pieceStroke: number,
+  color: string
+): string {
+  return (
+    `<style>.${className},.${className} *{stroke:${color};` +
+    `stroke-width:${pieceStroke + radius * 2}px;stroke-linejoin:round;stroke-linecap:round}</style>`
+  );
+}
+
 export function pieceHaloFilterSVG(id: string, radius: number, color: string): string {
   return (
     `<filter id="${id}" x="-20%" y="-20%" width="140%" height="140%">` +

@@ -52,6 +52,7 @@ export {
   boardOutlineWidth,
   pieceHaloRadius,
   pieceHaloFilterSVG,
+  pieceHaloStyleSVG,
   SQUARE_PATTERNS,
   HATCH_DIVISIONS,
   HATCH_LINE_RATIO,

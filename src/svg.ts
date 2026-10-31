@@ -13,8 +13,8 @@ import {
   boardOutlineWidth,
   hatchBoardPath,
   hatchLineWidth,
-  pieceHaloFilterSVG,
   pieceHaloRadius,
+  pieceHaloStyleSVG,
   type SquarePattern,
 } from './pattern.js';
 
@@ -34,6 +34,7 @@ export interface DiagramOptions {
 }
 
 const PIECE_VIEWBOX = 45;
+const PIECE_STROKE = 1.5;
 
 function safeColor(color: string | undefined, fallback: string): string {
   if (color && isValidHexColor(color)) return color;
@@ -91,7 +92,7 @@ export function generateDiagram(options: DiagramOptions): string {
   parts.push(`<title>${escapeXml(label)}</title>`);
   if (hatched) {
     parts.push(
-      `<defs>${pieceHaloFilterSVG('cv-halo', pieceHaloRadius(PIECE_VIEWBOX), escapeXml(lightSquare))}</defs>`
+      `<defs>${pieceHaloStyleSVG('cv-halo', pieceHaloRadius(PIECE_VIEWBOX), PIECE_STROKE, escapeXml(lightSquare))}</defs>`
     );
   }
 
@@ -174,7 +175,7 @@ export function generateDiagram(options: DiagramOptions): string {
       const onHatch = hatched && (row + col) % 2 === 1;
       parts.push(
         `<svg x="${x}" y="${y}" width="${squareSize}" height="${squareSize}" viewBox="0 0 ${PIECE_VIEWBOX} ${PIECE_VIEWBOX}">` +
-        (onHatch ? `<g filter="url(#cv-halo)">${innerContent}</g>` : innerContent) +
+        (onHatch ? `<g class="cv-halo">${innerContent}</g>${innerContent}` : innerContent) +
         `</svg>`
       );
     }
