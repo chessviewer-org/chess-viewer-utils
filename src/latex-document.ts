@@ -1,5 +1,6 @@
 import {
   type BoardLineOptions,
+  type DiagramFields,
   LATEX_DIAGRAM_SIZE_PT,
   LATEX_PACKAGE_META,
   type LatexBoardSize,
@@ -66,6 +67,15 @@ interface PreparedPosition {
   award: string;
   stipulation: string;
   remark: string;
+  dedication: string;
+  version: string;
+  after: string;
+  condition: string;
+  twins: string;
+  captionTop: string;
+  captionLeft: string;
+  captionCenter: string;
+  captionRight: string;
   solution: string;
   white: string;
   black: string;
@@ -141,6 +151,15 @@ function preparePosition(
     award: cleanText(position.award, 'award'),
     stipulation: cleanText(position.stipulation, 'stipulation'),
     remark: cleanText(position.remark, 'remark'),
+    dedication: cleanText(position.dedication, 'dedication'),
+    version: cleanText(position.version, 'version'),
+    after: cleanText(position.after, 'after'),
+    condition: cleanText(position.condition, 'condition'),
+    twins: cleanText(position.twins, 'twins'),
+    captionTop: cleanText(position.captionTop, 'caption top'),
+    captionLeft: cleanText(position.captionLeft, 'caption left'),
+    captionCenter: cleanText(position.captionCenter, 'caption centre'),
+    captionRight: cleanText(position.captionRight, 'caption right'),
     solution: cleanText(position.solution, 'solution'),
     white: cleanText(position.white, 'white player'),
     black: cleanText(position.black, 'black player'),
@@ -167,19 +186,44 @@ function classicLines(
     .filter(Boolean)
     .join(' --- ');
   const { white, black } = pieceCounts(item.fen);
-  const footer = [
-    item.stipulation ? `\\textbf{${item.stipulation}}` : '',
-    pieceCount ? `(${white}+${black})` : '',
-  ]
-    .filter(Boolean)
-    .join('\\quad ');
+  const footer = hasCustomFooter(item)
+    ? ''
+    : [
+        item.stipulation ? `\\textbf{${item.stipulation}}` : '',
+        pieceCount ? `(${white}+${black})` : '',
+      ]
+        .filter(Boolean)
+        .join('\\quad ');
 
   return [
     headline,
     credits ? `{\\small ${credits}}` : '',
+    ...lineage(item),
+    item.dedication ? `{\\small\\itshape ${item.dedication}}` : '',
     item.remark ? `{\\small\\itshape ${item.remark}}` : '',
     footer,
+    ...problemTerms(item),
   ].filter(Boolean);
+}
+
+function hasCustomFooter(item: PreparedPosition): boolean {
+  return Boolean(item.captionLeft || item.captionCenter || item.captionRight);
+}
+
+function hasCustomCaption(item: PreparedPosition): boolean {
+  return Boolean(item.captionTop) || hasCustomFooter(item);
+}
+
+function lineage(item: PreparedPosition): string[] {
+  return [item.after, item.version].map((text) =>
+    text ? `{\\small\\itshape ${text}}` : ''
+  );
+}
+
+function problemTerms(item: PreparedPosition): string[] {
+  return [item.condition, item.twins].map((text) =>
+    text ? `{\\small ${text}}` : ''
+  );
 }
 
 function joined(parts: string[], separator: string): string {
@@ -211,6 +255,7 @@ interface CaptionParts {
   left: string;
   right: string;
   center: string;
+  terms: string[];
 }
 
 function captionParts(
@@ -223,25 +268,30 @@ function captionParts(
   const stipulation = item.stipulation ? `\\textbf{${item.stipulation}}` : '';
   const credits = [
     item.author ? `\\textbf{${item.author}}` : '',
+    ...lineage(item),
     item.source ? `{\\small\\itshape ${item.source}}` : '',
     item.award ? `{\\small ${item.award}}` : '',
+    item.dedication ? `{\\small\\itshape ${item.dedication}}` : '',
     item.remark ? `{\\small\\itshape ${item.remark}}` : '',
   ];
-  const blank = { above: [], left: '', right: '', center: '' };
+  const terms = problemTerms(item);
+  const blank = { above: [], left: '', right: '', center: '', terms: [] };
 
   switch (item.captionStyle) {
     case 'problem':
       return {
         ...blank,
         above: [headline(item, index, options.numbering), ...credits],
-        left: count,
-        right: stipulation,
+        left: stipulation,
+        right: count,
+        terms,
       };
     case 'study':
       return {
         ...blank,
         above: [headline(item, index, options.numbering), ...credits],
         center: joined([stipulation, count], '\\quad '),
+        terms,
       };
     case 'game':
       return {
@@ -264,6 +314,7 @@ function captionParts(
         ...blank,
         above: [number],
         center: joined([stipulation, count], '\\quad '),
+        terms,
       };
   }
 }
@@ -275,6 +326,16 @@ interface FramedCell {
   below: string;
 }
 
+function captionRow(left: string, center: string, right: string): string {
+  if (!left && !right) return center;
+  if (!center) return `\\makebox[${BOARD_WIDTH}]{${left}\\hfill ${right}}`;
+  return `\\makebox[${BOARD_WIDTH}]{\\rlap{${left}}\\hfill ${center}\\hfill\\llap{${right}}}`;
+}
+
+function customTop(item: PreparedPosition): string {
+  return item.captionTop ? `{\\small ${item.captionTop}}` : '';
+}
+
 function framedCell(
   item: PreparedPosition,
   index: number,
@@ -283,24 +344,30 @@ function framedCell(
 ): FramedCell {
   if (item.captionStyle === 'classic') {
     return {
-      above: '',
+      above: customTop(item),
       board,
-      below: classicLines(
-        item,
-        index,
-        options.numbering,
-        options.pieceCount
-      ).join('\\par '),
+      below: [
+        captionRow(item.captionLeft, item.captionCenter, item.captionRight),
+        ...classicLines(item, index, options.numbering, options.pieceCount),
+      ]
+        .filter(Boolean)
+        .join('\\par '),
     };
   }
   const parts = captionParts(item, index, options);
   return {
-    above: parts.above.filter(Boolean).join('\\par '),
+    above: [...parts.above, customTop(item)].filter(Boolean).join('\\par '),
     board,
-    below:
-      parts.left || parts.right
-        ? `\\makebox[${BOARD_WIDTH}]{${parts.left}\\hfill ${parts.right}}`
-        : parts.center,
+    below: [
+      captionRow(
+        item.captionLeft || parts.left,
+        item.captionCenter || parts.center,
+        item.captionRight || parts.right
+      ),
+      ...parts.terms,
+    ]
+      .filter(Boolean)
+      .join('\\par '),
   };
 }
 
@@ -334,26 +401,36 @@ function framedLayout(cells: FramedCell[], columns: number): string[] {
   return lines;
 }
 
-function diagramFields(item: PreparedPosition) {
+const NO_DIAGRAM_FIELDS: DiagramFields = {
+  author: '',
+  source: '',
+  award: '',
+  stipulation: '',
+  remark: '',
+  dedication: '',
+  version: '',
+  after: '',
+  condition: '',
+  twins: '',
+};
+
+function diagramFields(item: PreparedPosition): DiagramFields {
   switch (item.captionStyle) {
     case 'game':
       return {
-        author: '',
+        ...NO_DIAGRAM_FIELDS,
         source: joined(
           [joined([item.white, item.black], ' -- '), item.event, item.date],
           ', '
         ),
-        award: '',
-        stipulation: '',
         remark: joined([item.caption, item.remark], ' --- '),
       };
     case 'plain':
       return {
-        author: '',
-        source: '',
-        award: '',
+        ...NO_DIAGRAM_FIELDS,
         stipulation: item.stipulation,
-        remark: '',
+        condition: item.condition,
+        twins: item.twins,
       };
     default:
       return {
@@ -362,8 +439,38 @@ function diagramFields(item: PreparedPosition) {
         award: item.award,
         stipulation: item.stipulation,
         remark: item.remark,
+        dedication: item.dedication,
+        version: item.version,
+        after: item.after,
+        condition: item.condition,
+        twins: item.twins,
       };
   }
+}
+
+function diagramCellLines(item: PreparedPosition): string[] {
+  const fields = diagramFields(item);
+  let lines = diagramLines(item.fen, {
+    ...fields,
+    stipulation: item.captionLeft || fields.stipulation,
+  });
+  if (item.captionRight) {
+    lines = [
+      '\\begingroup',
+      `\\expandafter\\def\\csname do@put@count\\endcsname{\\ \\ ${item.captionRight}}`,
+      ...lines,
+      '\\endgroup',
+    ];
+  }
+  if (item.captionTop) {
+    lines = [
+      `\\vbox{{\\small ${item.captionTop}\\par}\\smallskip`,
+      ...lines,
+      '}',
+    ];
+  }
+  if (item.captionCenter) lines.push(`\\par{\\small ${item.captionCenter}}`);
+  return lines;
 }
 
 function captionLines(
@@ -389,7 +496,7 @@ function cellLines(
   const boardOptions: BoardLineOptions = { ...options, flipped: item.flipped };
 
   if (latexPackage === 'diagram') {
-    return diagramLines(item.fen, diagramFields(item));
+    return diagramCellLines(item);
   }
 
   const board =
@@ -499,7 +606,9 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
   };
   const framed =
     latexPackage !== 'diagram' &&
-    items.some((item) => item.captionStyle !== 'classic');
+    items.some(
+      (item) => item.captionStyle !== 'classic' || hasCustomCaption(item)
+    );
 
   let body: string[];
   if (framed) {
@@ -555,6 +664,15 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
       item.award,
       item.stipulation,
       item.remark,
+      item.dedication,
+      item.version,
+      item.after,
+      item.condition,
+      item.twins,
+      item.captionTop,
+      item.captionLeft,
+      item.captionCenter,
+      item.captionRight,
       item.solution,
       item.white,
       item.black,

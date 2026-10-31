@@ -156,11 +156,16 @@ const { light, dark } = BOARD_THEMES.print;
 generateDiagram({ fen, lightSquare: light, darkSquare: dark, squarePattern: 'hatched' });
 ```
 
-The geometry is exported for other renderers: `hatchSegments(squareSize)`
-returns the line segments of one square in local coordinates,
-`hatchLineWidth(squareSize)` their stroke width, and `hatchPatternSVG()` an SVG
-`<pattern>` anchored at the board origin. Lines are aligned to square corners,
-so neighbouring squares join seamlessly.
+The board is laid on one light base and the hatching is drawn as a single
+path clipped to the dark squares, so no tile edges or seams show at any zoom
+or display scale. The geometry is exported for other renderers:
+`hatchSegments(squareSize)` returns the line segments of one square in local
+coordinates, `hatchBoardPath(originX, originY, squareSize)` the path data for
+the whole board, `hatchLineWidth(squareSize)` their stroke width, and
+`hatchPatternSVG()` an SVG `<pattern>` anchored at the board origin. Pieces on
+hatched squares get a light halo drawn as a wider outline beneath the piece,
+which `pieceHaloStyleSVG()` provides as a stylesheet, so it stays sharp at any
+size instead of being rasterised by a filter.
 
 ---
 
@@ -603,13 +608,17 @@ generateLatexDocument({
 | `captionStyle` | `'classic'`, `'problem'`, `'study'`, `'game'`, `'plain'` | Text layout around each board; also settable per position |
 
 Each position accepts `fen`, `flipped`, `caption`, `author`, `source`, `award`,
-`stipulation`, `remark`, `solution`, the game fields `white`, `black`, `event`
-and `date`, and its own `captionStyle`. The `problem` style prints the number
-and credits above the board with `(white+black)` bottom-left and the
-stipulation bottom-right; `game` prints the players, event and date above and
+`stipulation`, `remark`, `solution`, the composer fields `dedication`,
+`version`, `after`, `condition` and `twins`, the game fields `white`, `black`,
+`event` and `date`, its own `captionStyle`, and free text for any slot:
+`captionTop` above the board and `captionLeft`, `captionCenter`,
+`captionRight` below it, each replacing what the style would print there. The `problem` style prints the number
+and credits above the board with the stipulation bottom-left and
+`(white+black)` bottom-right, as the `diagram` package does; `game` prints the players, event and date above and
 the side to move below. With the `chessboard` package,
 `highlights` and `arrows` (the same shapes the SVG renderer takes) become
-`markfields`/`markmoves` keys with matching colours. The `diagram` package
+`backfields`/`markfields`/`markmoves` keys with matching colours; filled
+squares are drawn behind the pieces so a highlighted piece stays visible. The `diagram` package
 always prints White at the bottom and no coordinates, and writes authors as
 `Surname, First name` (a plain `First Last` is rewritten for you).
 

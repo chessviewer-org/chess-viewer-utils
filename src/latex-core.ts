@@ -52,6 +52,15 @@ export interface LatexPosition {
   award?: string;
   stipulation?: string;
   remark?: string;
+  dedication?: string;
+  version?: string;
+  after?: string;
+  condition?: string;
+  twins?: string;
+  captionTop?: string;
+  captionLeft?: string;
+  captionCenter?: string;
+  captionRight?: string;
   solution?: string;
   white?: string;
   black?: string;
@@ -222,7 +231,7 @@ interface MarkGroup {
   style: string;
   color: string;
   tint: boolean;
-  key: 'markfields' | 'markmoves';
+  key: 'backfields' | 'markfields' | 'markmoves';
   items: string[];
 }
 
@@ -248,7 +257,7 @@ function collectMarkGroups(position: LatexPosition): MarkGroup[] {
     }
     const ring = highlight.style === 'ring';
     add(
-      'markfields',
+      ring ? 'markfields' : 'backfields',
       ring ? 'circle' : 'color',
       highlight.color ?? DEFAULT_HIGHLIGHT_COLOR,
       !ring,
@@ -352,6 +361,11 @@ export interface DiagramFields {
   award: string;
   stipulation: string;
   remark: string;
+  dedication: string;
+  version: string;
+  after: string;
+  condition: string;
+  twins: string;
 }
 
 export function diagramLines(fen: string, fields: DiagramFields): string[] {
@@ -360,6 +374,11 @@ export function diagramLines(fen: string, fields: DiagramFields): string[] {
   if (fields.author) lines.push(`\\author{${diagramAuthors(fields.author)}}`);
   if (fields.source) lines.push(`\\source{${fields.source}}`);
   if (fields.award) lines.push(`\\award{${fields.award}}`);
+  if (fields.dedication) lines.push(`\\dedication{${fields.dedication}}`);
+  if (fields.version) lines.push(`\\version{${fields.version}}`);
+  if (fields.after) lines.push(`\\after{${fields.after}}`);
+  if (fields.condition) lines.push(`\\condition{${fields.condition}}`);
+  if (fields.twins) lines.push(`\\twins{${fields.twins}}`);
   if (fields.remark) lines.push(`\\remark{${fields.remark}}`);
   if (fields.stipulation) lines.push(`\\stipulation{${fields.stipulation}}`);
   lines.push(

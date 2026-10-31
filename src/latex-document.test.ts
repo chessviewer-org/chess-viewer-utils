@@ -243,7 +243,7 @@ describe('chessboard marks', () => {
     const latex = generateBoardLatex({ ...marked, latexPackage: 'chessboard' });
     assert.match(latex, /\\definecolor\{cvFFEB3B\}\{HTML\}\{FFEB3B\}/);
     assert.match(latex, /\\definecolor\{cvE8412C\}\{HTML\}\{E8412C\}/);
-    assert.match(latex, /pgfstyle=color,\n {2}color=cvFFEB3B!55,\n {2}markfields=\{e4\}/);
+    assert.match(latex, /pgfstyle=color,\n {2}color=cvFFEB3B!55,\n {2}backfields=\{e4\}/);
     assert.match(latex, /pgfstyle=circle,\n {2}color=cvE8412C,\n {2}markfields=\{d5\}/);
     assert.match(latex, /pgfstyle=straightmove,\n {2}color=cv15781B,\n {2}markmoves=\{e2-e4\}/);
   });
@@ -254,8 +254,15 @@ describe('chessboard marks', () => {
       latexPackage: 'chessboard',
       highlights: [{ square: 'a1' }, { square: 'b2' }]
     });
-    assert.match(latex, /markfields=\{a1,b2\}/);
-    assert.equal(latex.match(/markfields/g)?.length, 1);
+    assert.match(latex, /backfields=\{a1,b2\}/);
+    assert.equal(latex.match(/backfields/g)?.length, 1);
+  });
+
+  test('draws filled squares behind the pieces and rings above them', () => {
+    const latex = generateBoardLatex({ ...marked, latexPackage: 'chessboard' });
+    assert.doesNotMatch(latex, /markfields=\{e4\}/);
+    assert.match(latex, /backfields=\{e4\}/);
+    assert.match(latex, /markfields=\{d5\}/);
   });
 
   test('rejects colours that are not six-digit hex', () => {
@@ -371,6 +378,155 @@ describe('diagram package', () => {
   });
 });
 
+describe('composer fields', () => {
+  const composed = {
+    fen: ENDGAME_FEN,
+    author: 'Loyd, Sam',
+    source: 'Chess Monthly',
+    stipulation: '#2',
+    dedication: 'Dedicated to A. Petrov',
+    version: 'Version by G. Kasparyan',
+    after: 'after N. Petrovic',
+    condition: 'Circe',
+    twins: 'b) wKe3-f3',
+    remark: 'Correction'
+  };
+
+  test('passes dedication, version, after, condition and twins to the diagram package', () => {
+    const latex = generateBoardLatex({ ...composed, latexPackage: 'diagram' });
+    const body = lines(latex);
+    const order = [
+      '\\dedication{Dedicated to A. Petrov}',
+      '\\version{Version by G. Kasparyan}',
+      '\\after{after N. Petrovic}',
+      '\\condition{Circe}',
+      '\\twins{b) wKe3-f3}',
+      '\\remark{Correction}',
+      '\\stipulation{\\#2}'
+    ].map((line) => body.indexOf(line));
+    assert.ok(order.every((index) => index > 0));
+    assert.deepEqual(order, [...order].sort((a, b) => a - b));
+  });
+
+  test('keeps the condition and twins in plain style and drops them for games', () => {
+    const plain = generateLatexDocument({
+      latexPackage: 'diagram',
+      captionStyle: 'plain',
+      positions: [composed]
+    });
+    assert.match(plain, /\\condition\{Circe\}/);
+    assert.match(plain, /\\twins\{b\) wKe3-f3\}/);
+    assert.doesNotMatch(plain, /\\dedication|\\version|\\after/);
+    const game = generateLatexDocument({
+      latexPackage: 'diagram',
+      captionStyle: 'game',
+      positions: [composed]
+    });
+    assert.doesNotMatch(game, /\\condition|\\twins|\\dedication/);
+  });
+
+  test('prints lineage above and the problem terms below a framed board', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'chessboard',
+      captionStyle: 'problem',
+      positions: [composed]
+    });
+    assert.match(
+      latex,
+      /\\textbf\{Loyd, Sam\}\\par \{\\small\\itshape after N\. Petrovic\}\\par \{\\small\\itshape Version by G\. Kasparyan\}\\par \{\\small\\itshape Chess Monthly\}\\par \{\\small\\itshape Dedicated to A\. Petrov\}/
+    );
+    assert.match(
+      latex,
+      /\\hfill \}\\par \{\\small Circe\}\\par \{\\small b\) wKe3-f3\}/
+    );
+  });
+
+  test('adds the composer fields to classic captions', () => {
+    const latex = generateBoardLatex({ ...composed, latexPackage: 'skak' });
+    for (const text of ['after N. Petrovic', 'Dedicated to A. Petrov', 'Circe', 'b) wKe3-f3'])
+      assert.ok(latex.includes(text), text);
+  });
+
+  test('escapes composer text', () => {
+    const latex = generateBoardLatex({
+      fen: ENDGAME_FEN,
+      latexPackage: 'diagram',
+      condition: 'Circe & Madrasi 100%'
+    });
+    assert.match(latex, /\\condition\{Circe \\& Madrasi 100\\%\}/);
+  });
+});
+
+describe('free caption text', () => {
+  const custom = {
+    fen: ENDGAME_FEN,
+    author: 'Loyd, Sam',
+    stipulation: '#2',
+    captionTop: 'In memoriam',
+    captionLeft: 'h#2 2.1;1.1',
+    captionCenter: 'C+',
+    captionRight: '(2+1)'
+  };
+
+  test('adds a top line and replaces the footer slots of a framed board', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'chessboard',
+      captionStyle: 'problem',
+      pieceCount: true,
+      positions: [custom]
+    });
+    assert.match(latex, /\\textbf\{Loyd, Sam\}\\par \{\\small In memoriam\}/);
+    assert.match(
+      latex,
+      /\\makebox\[\\cvboardwidth\]\{\\rlap\{h\\#2 2\.1;1\.1\}\\hfill C\+\\hfill\\llap\{\(2\+1\)\}\}/
+    );
+    assert.doesNotMatch(latex, /\\textbf\{\\#2\}/);
+  });
+
+  test('keeps the style defaults for the slots that are left empty', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'skak',
+      captionStyle: 'problem',
+      pieceCount: true,
+      positions: [{ fen: ENDGAME_FEN, stipulation: '#2', captionRight: '3.1.1.1' }]
+    });
+    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\\textbf\{\\#2\}\\hfill 3\.1\.1\.1\}/);
+  });
+
+  test('frames classic captions and drops their footer when custom text is set', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'skak',
+      pieceCount: true,
+      positions: [custom]
+    });
+    assert.match(latex, /tabular\*/);
+    assert.match(latex, /^\{\\small In memoriam\} \\\\\[2pt\]$/m);
+    assert.doesNotMatch(latex, /\\textbf\{\\#2\}\\quad/);
+  });
+
+  test('maps the slots onto the diagram package', () => {
+    const body = lines(generateBoardLatex({ ...custom, latexPackage: 'diagram' }));
+    assert.equal(body.indexOf('\\vbox{{\\small In memoriam\\par}\\smallskip') + 1, body.indexOf('\\begingroup'));
+    assert.ok(
+      body.includes(
+        '\\expandafter\\def\\csname do@put@count\\endcsname{\\ \\ (2+1)}'
+      )
+    );
+    assert.ok(body.includes('\\stipulation{h\\#2 2.1;1.1}'));
+    assert.equal(body.at(-1), '\\par{\\small C+}');
+    assert.equal(body.indexOf('\\end{diagram}') + 1, body.indexOf('\\endgroup'));
+  });
+
+  test('escapes free caption text', () => {
+    const latex = generateBoardLatex({
+      fen: ENDGAME_FEN,
+      latexPackage: 'skak',
+      captionTop: '50% & {more}'
+    });
+    assert.match(latex, /\{\\small 50\\% \\& \\\{more\\\}\}/);
+  });
+});
+
 describe('every package accepts the full option set', () => {
   test('generates without throwing', () => {
     for (const latexPackage of LATEX_PACKAGES) {
@@ -426,13 +582,13 @@ describe('caption styles', () => {
     assert.doesNotMatch(latex, /tabular\*|cvboard/);
   });
 
-  test('puts the count bottom-left and the stipulation bottom-right in problem style', () => {
+  test('puts the stipulation bottom-left and the count bottom-right in problem style', () => {
     const latex = generateLatexDocument({
       captionStyle: 'problem',
       pieceCount: true,
       positions: [problem]
     });
-    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\(2\+1\)\\hfill \\textbf\{\\#2\}\}/);
+    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\\textbf\{\\#2\}\\hfill \(2\+1\)\}/);
     assert.match(latex, /\\textbf\{Loyd, Sam\}\\par \{\\small\\itshape Chess Monthly\}/);
     assert.match(latex, /\\usepackage\{array\}/);
     assert.match(latex, /\\newsavebox\{\\cvboard\}/);
