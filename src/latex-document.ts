@@ -72,6 +72,10 @@ interface PreparedPosition {
   after: string;
   condition: string;
   twins: string;
+  captionTop: string;
+  captionLeft: string;
+  captionCenter: string;
+  captionRight: string;
   solution: string;
   white: string;
   black: string;
@@ -152,6 +156,10 @@ function preparePosition(
     after: cleanText(position.after, 'after'),
     condition: cleanText(position.condition, 'condition'),
     twins: cleanText(position.twins, 'twins'),
+    captionTop: cleanText(position.captionTop, 'caption top'),
+    captionLeft: cleanText(position.captionLeft, 'caption left'),
+    captionCenter: cleanText(position.captionCenter, 'caption centre'),
+    captionRight: cleanText(position.captionRight, 'caption right'),
     solution: cleanText(position.solution, 'solution'),
     white: cleanText(position.white, 'white player'),
     black: cleanText(position.black, 'black player'),
@@ -178,12 +186,14 @@ function classicLines(
     .filter(Boolean)
     .join(' --- ');
   const { white, black } = pieceCounts(item.fen);
-  const footer = [
-    item.stipulation ? `\\textbf{${item.stipulation}}` : '',
-    pieceCount ? `(${white}+${black})` : '',
-  ]
-    .filter(Boolean)
-    .join('\\quad ');
+  const footer = hasCustomFooter(item)
+    ? ''
+    : [
+        item.stipulation ? `\\textbf{${item.stipulation}}` : '',
+        pieceCount ? `(${white}+${black})` : '',
+      ]
+        .filter(Boolean)
+        .join('\\quad ');
 
   return [
     headline,
@@ -194,6 +204,14 @@ function classicLines(
     footer,
     ...problemTerms(item),
   ].filter(Boolean);
+}
+
+function hasCustomFooter(item: PreparedPosition): boolean {
+  return Boolean(item.captionLeft || item.captionCenter || item.captionRight);
+}
+
+function hasCustomCaption(item: PreparedPosition): boolean {
+  return Boolean(item.captionTop) || hasCustomFooter(item);
 }
 
 function lineage(item: PreparedPosition): string[] {
@@ -308,6 +326,16 @@ interface FramedCell {
   below: string;
 }
 
+function captionRow(left: string, center: string, right: string): string {
+  if (!left && !right) return center;
+  if (!center) return `\\makebox[${BOARD_WIDTH}]{${left}\\hfill ${right}}`;
+  return `\\makebox[${BOARD_WIDTH}]{\\rlap{${left}}\\hfill ${center}\\hfill\\llap{${right}}}`;
+}
+
+function customTop(item: PreparedPosition): string {
+  return item.captionTop ? `{\\small ${item.captionTop}}` : '';
+}
+
 function framedCell(
   item: PreparedPosition,
   index: number,
@@ -316,24 +344,26 @@ function framedCell(
 ): FramedCell {
   if (item.captionStyle === 'classic') {
     return {
-      above: '',
+      above: customTop(item),
       board,
-      below: classicLines(
-        item,
-        index,
-        options.numbering,
-        options.pieceCount
-      ).join('\\par '),
+      below: [
+        captionRow(item.captionLeft, item.captionCenter, item.captionRight),
+        ...classicLines(item, index, options.numbering, options.pieceCount),
+      ]
+        .filter(Boolean)
+        .join('\\par '),
     };
   }
   const parts = captionParts(item, index, options);
   return {
-    above: parts.above.filter(Boolean).join('\\par '),
+    above: [...parts.above, customTop(item)].filter(Boolean).join('\\par '),
     board,
     below: [
-      parts.left || parts.right
-        ? `\\makebox[${BOARD_WIDTH}]{${parts.left}\\hfill ${parts.right}}`
-        : parts.center,
+      captionRow(
+        item.captionLeft || parts.left,
+        item.captionCenter || parts.center,
+        item.captionRight || parts.right
+      ),
       ...parts.terms,
     ]
       .filter(Boolean)
@@ -418,6 +448,31 @@ function diagramFields(item: PreparedPosition): DiagramFields {
   }
 }
 
+function diagramCellLines(item: PreparedPosition): string[] {
+  const fields = diagramFields(item);
+  let lines = diagramLines(item.fen, {
+    ...fields,
+    stipulation: item.captionLeft || fields.stipulation,
+  });
+  if (item.captionRight) {
+    lines = [
+      '\\begingroup',
+      `\\expandafter\\def\\csname do@put@count\\endcsname{\\ \\ ${item.captionRight}}`,
+      ...lines,
+      '\\endgroup',
+    ];
+  }
+  if (item.captionTop) {
+    lines = [
+      `\\vbox{{\\small ${item.captionTop}\\par}\\smallskip`,
+      ...lines,
+      '}',
+    ];
+  }
+  if (item.captionCenter) lines.push(`\\par{\\small ${item.captionCenter}}`);
+  return lines;
+}
+
 function captionLines(
   item: PreparedPosition,
   index: number,
@@ -441,7 +496,7 @@ function cellLines(
   const boardOptions: BoardLineOptions = { ...options, flipped: item.flipped };
 
   if (latexPackage === 'diagram') {
-    return diagramLines(item.fen, diagramFields(item));
+    return diagramCellLines(item);
   }
 
   const board =
@@ -551,7 +606,9 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
   };
   const framed =
     latexPackage !== 'diagram' &&
-    items.some((item) => item.captionStyle !== 'classic');
+    items.some(
+      (item) => item.captionStyle !== 'classic' || hasCustomCaption(item)
+    );
 
   let body: string[];
   if (framed) {
@@ -612,6 +669,10 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
       item.after,
       item.condition,
       item.twins,
+      item.captionTop,
+      item.captionLeft,
+      item.captionCenter,
+      item.captionRight,
       item.solution,
       item.white,
       item.black,

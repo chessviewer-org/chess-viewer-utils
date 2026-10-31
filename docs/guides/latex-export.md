@@ -133,6 +133,38 @@ Game positions take `white`, `black`, `event` and `date`. Every style except
 even when their headings have different lengths, and the footer spans the
 board width. This needs the `array` package, which every TeX installation has.
 
+### Free caption text
+
+When the styles are not enough, four fields place your own text around a
+board: `captionTop` adds a line directly above it, and `captionLeft`,
+`captionCenter` and `captionRight` fill the line under it. A footer field
+replaces what the style would print in that place and leaves the others alone,
+so `captionRight: '3.1.1.1'` swaps the piece count for a solution count and
+keeps the stipulation on the left.
+
+```ts
+generateLatexDocument({
+  latexPackage: 'chessboard',
+  captionStyle: 'problem',
+  pieceCount: true,
+  positions: [
+    {
+      fen: '8/8/8/3k4/8/4K3/3Q4/8 w - - 0 1',
+      author: 'Loyd, Sam',
+      captionTop: 'In memoriam',
+      captionLeft: 'h#2  2.1;1.1',
+      captionCenter: 'C+',
+      captionRight: '(2+1)'
+    }
+  ]
+});
+```
+
+A `classic` caption with custom text is framed like the other styles and
+drops its own stipulation and count line. With `diagram`, `captionLeft` takes
+the stipulation's place and `captionRight` the piece count's; `captionTop` is
+centred over the diagram and `captionCenter` under the package's own lines.
+
 The `diagram` package keeps its own layout: `game` writes the players, event
 and date into `\source` and the caption into `\remark`; `plain` keeps only the
 stipulation, condition and twins.

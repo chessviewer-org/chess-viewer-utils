@@ -457,6 +457,76 @@ describe('composer fields', () => {
   });
 });
 
+describe('free caption text', () => {
+  const custom = {
+    fen: ENDGAME_FEN,
+    author: 'Loyd, Sam',
+    stipulation: '#2',
+    captionTop: 'In memoriam',
+    captionLeft: 'h#2 2.1;1.1',
+    captionCenter: 'C+',
+    captionRight: '(2+1)'
+  };
+
+  test('adds a top line and replaces the footer slots of a framed board', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'chessboard',
+      captionStyle: 'problem',
+      pieceCount: true,
+      positions: [custom]
+    });
+    assert.match(latex, /\\textbf\{Loyd, Sam\}\\par \{\\small In memoriam\}/);
+    assert.match(
+      latex,
+      /\\makebox\[\\cvboardwidth\]\{\\rlap\{h\\#2 2\.1;1\.1\}\\hfill C\+\\hfill\\llap\{\(2\+1\)\}\}/
+    );
+    assert.doesNotMatch(latex, /\\textbf\{\\#2\}/);
+  });
+
+  test('keeps the style defaults for the slots that are left empty', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'skak',
+      captionStyle: 'problem',
+      pieceCount: true,
+      positions: [{ fen: ENDGAME_FEN, stipulation: '#2', captionRight: '3.1.1.1' }]
+    });
+    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\\textbf\{\\#2\}\\hfill 3\.1\.1\.1\}/);
+  });
+
+  test('frames classic captions and drops their footer when custom text is set', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'skak',
+      pieceCount: true,
+      positions: [custom]
+    });
+    assert.match(latex, /tabular\*/);
+    assert.match(latex, /^\{\\small In memoriam\} \\\\\[2pt\]$/m);
+    assert.doesNotMatch(latex, /\\textbf\{\\#2\}\\quad/);
+  });
+
+  test('maps the slots onto the diagram package', () => {
+    const body = lines(generateBoardLatex({ ...custom, latexPackage: 'diagram' }));
+    assert.equal(body.indexOf('\\vbox{{\\small In memoriam\\par}\\smallskip') + 1, body.indexOf('\\begingroup'));
+    assert.ok(
+      body.includes(
+        '\\expandafter\\def\\csname do@put@count\\endcsname{\\ \\ (2+1)}'
+      )
+    );
+    assert.ok(body.includes('\\stipulation{h\\#2 2.1;1.1}'));
+    assert.equal(body.at(-1), '\\par{\\small C+}');
+    assert.equal(body.indexOf('\\end{diagram}') + 1, body.indexOf('\\endgroup'));
+  });
+
+  test('escapes free caption text', () => {
+    const latex = generateBoardLatex({
+      fen: ENDGAME_FEN,
+      latexPackage: 'skak',
+      captionTop: '50% & {more}'
+    });
+    assert.match(latex, /\{\\small 50\\% \\& \\\{more\\\}\}/);
+  });
+});
+
 describe('every package accepts the full option set', () => {
   test('generates without throwing', () => {
     for (const latexPackage of LATEX_PACKAGES) {

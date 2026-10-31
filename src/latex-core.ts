@@ -57,6 +57,10 @@ export interface LatexPosition {
   after?: string;
   condition?: string;
   twins?: string;
+  captionTop?: string;
+  captionLeft?: string;
+  captionCenter?: string;
+  captionRight?: string;
   solution?: string;
   white?: string;
   black?: string;
