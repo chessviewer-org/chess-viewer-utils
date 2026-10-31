@@ -114,7 +114,7 @@ document and override it per position, so a book can mix games and problems.
 | Style     | Above the board                          | Below the board                              |
 | --------- | ---------------------------------------- | -------------------------------------------- |
 | `classic` | —                                        | number, caption, credits, remark, stipulation |
-| `problem` | number, caption, author, source, award   | `(white+black)` left, stipulation right      |
+| `problem` | number, caption, author, source, award   | stipulation left, `(white+black)` right      |
 | `study`   | number, caption, author, source, award   | stipulation and `(white+black)` centred      |
 | `game`    | number, `White -- Black`, event and date | caption left, side to move right             |
 | `plain`   | number                                   | stipulation                                  |

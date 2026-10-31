@@ -433,13 +433,13 @@ describe('caption styles', () => {
     assert.doesNotMatch(latex, /tabular\*|cvboard/);
   });
 
-  test('puts the count bottom-left and the stipulation bottom-right in problem style', () => {
+  test('puts the stipulation bottom-left and the count bottom-right in problem style', () => {
     const latex = generateLatexDocument({
       captionStyle: 'problem',
       pieceCount: true,
       positions: [problem]
     });
-    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\(2\+1\)\\hfill \\textbf\{\\#2\}\}/);
+    assert.match(latex, /\\makebox\[\\cvboardwidth\]\{\\textbf\{\\#2\}\\hfill \(2\+1\)\}/);
     assert.match(latex, /\\textbf\{Loyd, Sam\}\\par \{\\small\\itshape Chess Monthly\}/);
     assert.match(latex, /\\usepackage\{array\}/);
     assert.match(latex, /\\newsavebox\{\\cvboard\}/);

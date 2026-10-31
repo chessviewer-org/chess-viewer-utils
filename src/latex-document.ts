@@ -234,8 +234,8 @@ function captionParts(
       return {
         ...blank,
         above: [headline(item, index, options.numbering), ...credits],
-        left: count,
-        right: stipulation,
+        left: stipulation,
+        right: count,
       };
     case 'study':
       return {

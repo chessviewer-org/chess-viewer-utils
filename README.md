@@ -605,8 +605,8 @@ generateLatexDocument({
 Each position accepts `fen`, `flipped`, `caption`, `author`, `source`, `award`,
 `stipulation`, `remark`, `solution`, the game fields `white`, `black`, `event`
 and `date`, and its own `captionStyle`. The `problem` style prints the number
-and credits above the board with `(white+black)` bottom-left and the
-stipulation bottom-right; `game` prints the players, event and date above and
+and credits above the board with the stipulation bottom-left and
+`(white+black)` bottom-right, as the `diagram` package does; `game` prints the players, event and date above and
 the side to move below. With the `chessboard` package,
 `highlights` and `arrows` (the same shapes the SVG renderer takes) become
 `backfields`/`markfields`/`markmoves` keys with matching colours; filled
