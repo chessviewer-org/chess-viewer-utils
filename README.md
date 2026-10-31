@@ -603,8 +603,9 @@ generateLatexDocument({
 | `captionStyle` | `'classic'`, `'problem'`, `'study'`, `'game'`, `'plain'` | Text layout around each board; also settable per position |
 
 Each position accepts `fen`, `flipped`, `caption`, `author`, `source`, `award`,
-`stipulation`, `remark`, `solution`, the game fields `white`, `black`, `event`
-and `date`, and its own `captionStyle`. The `problem` style prints the number
+`stipulation`, `remark`, `solution`, the composer fields `dedication`,
+`version`, `after`, `condition` and `twins`, the game fields `white`, `black`,
+`event` and `date`, and its own `captionStyle`. The `problem` style prints the number
 and credits above the board with the stipulation bottom-left and
 `(white+black)` bottom-right, as the `diagram` package does; `game` prints the players, event and date above and
 the side to move below. With the `chessboard` package,

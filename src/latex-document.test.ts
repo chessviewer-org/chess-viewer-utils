@@ -378,6 +378,85 @@ describe('diagram package', () => {
   });
 });
 
+describe('composer fields', () => {
+  const composed = {
+    fen: ENDGAME_FEN,
+    author: 'Loyd, Sam',
+    source: 'Chess Monthly',
+    stipulation: '#2',
+    dedication: 'Dedicated to A. Petrov',
+    version: 'Version by G. Kasparyan',
+    after: 'after N. Petrovic',
+    condition: 'Circe',
+    twins: 'b) wKe3-f3',
+    remark: 'Correction'
+  };
+
+  test('passes dedication, version, after, condition and twins to the diagram package', () => {
+    const latex = generateBoardLatex({ ...composed, latexPackage: 'diagram' });
+    const body = lines(latex);
+    const order = [
+      '\\dedication{Dedicated to A. Petrov}',
+      '\\version{Version by G. Kasparyan}',
+      '\\after{after N. Petrovic}',
+      '\\condition{Circe}',
+      '\\twins{b) wKe3-f3}',
+      '\\remark{Correction}',
+      '\\stipulation{\\#2}'
+    ].map((line) => body.indexOf(line));
+    assert.ok(order.every((index) => index > 0));
+    assert.deepEqual(order, [...order].sort((a, b) => a - b));
+  });
+
+  test('keeps the condition and twins in plain style and drops them for games', () => {
+    const plain = generateLatexDocument({
+      latexPackage: 'diagram',
+      captionStyle: 'plain',
+      positions: [composed]
+    });
+    assert.match(plain, /\\condition\{Circe\}/);
+    assert.match(plain, /\\twins\{b\) wKe3-f3\}/);
+    assert.doesNotMatch(plain, /\\dedication|\\version|\\after/);
+    const game = generateLatexDocument({
+      latexPackage: 'diagram',
+      captionStyle: 'game',
+      positions: [composed]
+    });
+    assert.doesNotMatch(game, /\\condition|\\twins|\\dedication/);
+  });
+
+  test('prints lineage above and the problem terms below a framed board', () => {
+    const latex = generateLatexDocument({
+      latexPackage: 'chessboard',
+      captionStyle: 'problem',
+      positions: [composed]
+    });
+    assert.match(
+      latex,
+      /\\textbf\{Loyd, Sam\}\\par \{\\small\\itshape after N\. Petrovic\}\\par \{\\small\\itshape Version by G\. Kasparyan\}\\par \{\\small\\itshape Chess Monthly\}\\par \{\\small\\itshape Dedicated to A\. Petrov\}/
+    );
+    assert.match(
+      latex,
+      /\\hfill \}\\par \{\\small Circe\}\\par \{\\small b\) wKe3-f3\}/
+    );
+  });
+
+  test('adds the composer fields to classic captions', () => {
+    const latex = generateBoardLatex({ ...composed, latexPackage: 'skak' });
+    for (const text of ['after N. Petrovic', 'Dedicated to A. Petrov', 'Circe', 'b) wKe3-f3'])
+      assert.ok(latex.includes(text), text);
+  });
+
+  test('escapes composer text', () => {
+    const latex = generateBoardLatex({
+      fen: ENDGAME_FEN,
+      latexPackage: 'diagram',
+      condition: 'Circe & Madrasi 100%'
+    });
+    assert.match(latex, /\\condition\{Circe \\& Madrasi 100\\%\}/);
+  });
+});
+
 describe('every package accepts the full option set', () => {
   test('generates without throwing', () => {
     for (const latexPackage of LATEX_PACKAGES) {

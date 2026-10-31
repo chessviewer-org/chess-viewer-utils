@@ -1,5 +1,6 @@
 import {
   type BoardLineOptions,
+  type DiagramFields,
   LATEX_DIAGRAM_SIZE_PT,
   LATEX_PACKAGE_META,
   type LatexBoardSize,
@@ -66,6 +67,11 @@ interface PreparedPosition {
   award: string;
   stipulation: string;
   remark: string;
+  dedication: string;
+  version: string;
+  after: string;
+  condition: string;
+  twins: string;
   solution: string;
   white: string;
   black: string;
@@ -141,6 +147,11 @@ function preparePosition(
     award: cleanText(position.award, 'award'),
     stipulation: cleanText(position.stipulation, 'stipulation'),
     remark: cleanText(position.remark, 'remark'),
+    dedication: cleanText(position.dedication, 'dedication'),
+    version: cleanText(position.version, 'version'),
+    after: cleanText(position.after, 'after'),
+    condition: cleanText(position.condition, 'condition'),
+    twins: cleanText(position.twins, 'twins'),
     solution: cleanText(position.solution, 'solution'),
     white: cleanText(position.white, 'white player'),
     black: cleanText(position.black, 'black player'),
@@ -177,9 +188,24 @@ function classicLines(
   return [
     headline,
     credits ? `{\\small ${credits}}` : '',
+    ...lineage(item),
+    item.dedication ? `{\\small\\itshape ${item.dedication}}` : '',
     item.remark ? `{\\small\\itshape ${item.remark}}` : '',
     footer,
+    ...problemTerms(item),
   ].filter(Boolean);
+}
+
+function lineage(item: PreparedPosition): string[] {
+  return [item.after, item.version].map((text) =>
+    text ? `{\\small\\itshape ${text}}` : ''
+  );
+}
+
+function problemTerms(item: PreparedPosition): string[] {
+  return [item.condition, item.twins].map((text) =>
+    text ? `{\\small ${text}}` : ''
+  );
 }
 
 function joined(parts: string[], separator: string): string {
@@ -211,6 +237,7 @@ interface CaptionParts {
   left: string;
   right: string;
   center: string;
+  terms: string[];
 }
 
 function captionParts(
@@ -223,11 +250,14 @@ function captionParts(
   const stipulation = item.stipulation ? `\\textbf{${item.stipulation}}` : '';
   const credits = [
     item.author ? `\\textbf{${item.author}}` : '',
+    ...lineage(item),
     item.source ? `{\\small\\itshape ${item.source}}` : '',
     item.award ? `{\\small ${item.award}}` : '',
+    item.dedication ? `{\\small\\itshape ${item.dedication}}` : '',
     item.remark ? `{\\small\\itshape ${item.remark}}` : '',
   ];
-  const blank = { above: [], left: '', right: '', center: '' };
+  const terms = problemTerms(item);
+  const blank = { above: [], left: '', right: '', center: '', terms: [] };
 
   switch (item.captionStyle) {
     case 'problem':
@@ -236,12 +266,14 @@ function captionParts(
         above: [headline(item, index, options.numbering), ...credits],
         left: stipulation,
         right: count,
+        terms,
       };
     case 'study':
       return {
         ...blank,
         above: [headline(item, index, options.numbering), ...credits],
         center: joined([stipulation, count], '\\quad '),
+        terms,
       };
     case 'game':
       return {
@@ -264,6 +296,7 @@ function captionParts(
         ...blank,
         above: [number],
         center: joined([stipulation, count], '\\quad '),
+        terms,
       };
   }
 }
@@ -297,10 +330,14 @@ function framedCell(
   return {
     above: parts.above.filter(Boolean).join('\\par '),
     board,
-    below:
+    below: [
       parts.left || parts.right
         ? `\\makebox[${BOARD_WIDTH}]{${parts.left}\\hfill ${parts.right}}`
         : parts.center,
+      ...parts.terms,
+    ]
+      .filter(Boolean)
+      .join('\\par '),
   };
 }
 
@@ -334,26 +371,36 @@ function framedLayout(cells: FramedCell[], columns: number): string[] {
   return lines;
 }
 
-function diagramFields(item: PreparedPosition) {
+const NO_DIAGRAM_FIELDS: DiagramFields = {
+  author: '',
+  source: '',
+  award: '',
+  stipulation: '',
+  remark: '',
+  dedication: '',
+  version: '',
+  after: '',
+  condition: '',
+  twins: '',
+};
+
+function diagramFields(item: PreparedPosition): DiagramFields {
   switch (item.captionStyle) {
     case 'game':
       return {
-        author: '',
+        ...NO_DIAGRAM_FIELDS,
         source: joined(
           [joined([item.white, item.black], ' -- '), item.event, item.date],
           ', '
         ),
-        award: '',
-        stipulation: '',
         remark: joined([item.caption, item.remark], ' --- '),
       };
     case 'plain':
       return {
-        author: '',
-        source: '',
-        award: '',
+        ...NO_DIAGRAM_FIELDS,
         stipulation: item.stipulation,
-        remark: '',
+        condition: item.condition,
+        twins: item.twins,
       };
     default:
       return {
@@ -362,6 +409,11 @@ function diagramFields(item: PreparedPosition) {
         award: item.award,
         stipulation: item.stipulation,
         remark: item.remark,
+        dedication: item.dedication,
+        version: item.version,
+        after: item.after,
+        condition: item.condition,
+        twins: item.twins,
       };
   }
 }
@@ -555,6 +607,11 @@ export function generateLatexDocument(config: LatexDocumentConfig): string {
       item.award,
       item.stipulation,
       item.remark,
+      item.dedication,
+      item.version,
+      item.after,
+      item.condition,
+      item.twins,
       item.solution,
       item.white,
       item.black,

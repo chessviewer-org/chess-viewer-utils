@@ -95,11 +95,20 @@ options throw instead of being silently replaced.
 ### Position fields
 
 `fen` is required. `flipped`, `caption`, `author`, `source`, `award`,
-`stipulation`, `remark`, `solution`, `white`, `black`, `event`, `date` and
-`captionStyle` are optional; empty fields are left out
-of the markup. `highlights` and `arrows` use the same shapes as the SVG
-renderer and are emitted only for `chessboard`, grouped by style and colour
-with one `\definecolor` per colour.
+`stipulation`, `remark`, `dedication`, `version`, `after`, `condition`,
+`twins`, `solution`, `white`, `black`, `event`, `date` and `captionStyle` are
+optional; empty fields are left out of the markup.
+
+The composer fields follow `chess-problem-diagrams`: `after` and `version` are
+printed under the author, `dedication` directly above the board, and
+`condition` and `twins` under the stipulation line. Each is printed as given,
+so write `after N. Petrovic` or `Version by G. Kasparyan` in full. The other
+packages use the same order in the `problem`, `study` and `classic` styles;
+`plain` keeps only the condition and twins, and `game` leaves them all out.
+
+`highlights` and `arrows` use the same shapes as the SVG renderer and are
+emitted only for `chessboard`, grouped by style and colour with one
+`\definecolor` per colour.
 
 With `diagram`, authors are written `Surname, First name` and separated by
 `;`. A plain `First Last` is rewritten for you. Only the FEN placement field
@@ -126,7 +135,7 @@ board width. This needs the `array` package, which every TeX installation has.
 
 The `diagram` package keeps its own layout: `game` writes the players, event
 and date into `\source` and the caption into `\remark`; `plain` keeps only the
-stipulation.
+stipulation, condition and twins.
 
 ## Safety
 
